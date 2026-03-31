@@ -482,6 +482,30 @@ class Lukic_Maintenance_Mode {
 		// Send 503 status code
 		status_header( 503 );
 		header( 'Content-Type: text/html; charset=utf-8' );
+
+		$public_style_handle = 'Lukic-maintenance-public';
+		wp_register_style(
+			$public_style_handle,
+			plugin_dir_url( __DIR__ ) . 'assets/css/maintenance-public.css',
+			array(),
+			Lukic_SNIPPET_CODES_VERSION
+		);
+		wp_enqueue_style( $public_style_handle );
+		wp_add_inline_style(
+			$public_style_handle,
+			':root {' .
+				'--title-font-size: ' . esc_attr( $options['title_font_size'] ) . ';' .
+				'--subtitle-font-size: ' . esc_attr( $options['subtitle_font_size'] ) . ';' .
+				'--message-font-size: ' . esc_attr( $options['message_font_size'] ) . ';' .
+				'--title-color: ' . esc_attr( $options['title_color'] ) . ';' .
+				'--subtitle-color: ' . esc_attr( $options['subtitle_color'] ) . ';' .
+				'--message-color: ' . esc_attr( $options['message_color'] ) . ';' .
+				'--overlay-color: ' . esc_attr( $options['overlay_color'] ) . ';' .
+			'}' .
+			'.Lukic-maintenance-mode {' .
+				'background-image: url("' . esc_url_raw( $options['background_image'] ) . '");' .
+			'}'
+		);
 		?>
 		<!DOCTYPE html>
 		<html <?php language_attributes(); ?>>
@@ -489,21 +513,10 @@ class Lukic_Maintenance_Mode {
 			<meta charset="<?php bloginfo( 'charset' ); ?>">
 			<meta name="viewport" content="width=device-width, initial-scale=1">
 			<title><?php echo esc_html( $options['title'] ); ?> - <?php bloginfo( 'name' ); ?></title>
-			<link rel="stylesheet" href="<?php echo esc_url( Lukic_SNIPPET_CODES_PLUGIN_URL . 'assets/css/maintenance-public.css' ); ?>">
-			<style>
-				:root {
-					--title-font-size: <?php echo esc_attr( $options['title_font_size'] ); ?>;
-					--subtitle-font-size: <?php echo esc_attr( $options['subtitle_font_size'] ); ?>;
-					--message-font-size: <?php echo esc_attr( $options['message_font_size'] ); ?>;
-					--title-color: <?php echo esc_attr( $options['title_color'] ); ?>;
-					--subtitle-color: <?php echo esc_attr( $options['subtitle_color'] ); ?>;
-					--message-color: <?php echo esc_attr( $options['message_color'] ); ?>;
-					--overlay-color: <?php echo esc_attr( $options['overlay_color'] ); ?>;
-				}
-			</style>
+			<?php wp_print_styles( array( $public_style_handle ) ); ?>
 		</head>
 		<body>
-			<div class="Lukic-maintenance-mode" style="background-image: url('<?php echo esc_url( $options['background_image'] ); ?>');">
+			<div class="Lukic-maintenance-mode">
 				<div class="Lukic-overlay"></div>
 				<div class="Lukic-content">
 					<h1 class="Lukic-title"><?php echo esc_html( $options['title'] ); ?></h1>

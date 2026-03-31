@@ -1,0 +1,15 @@
+#adminmenu .toplevel_page_lukic-code-snippets .wp-menu-image {
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: 20px auto;
+	background-image: var(--lukic-menu-icon-url);
+	filter: invert(67%) sepia(72%) saturate(459%) hue-rotate(121deg) brightness(97%) contrast(101%);
+}
+
+#adminmenu .toplevel_page_lukic-code-snippets .wp-menu-image img {
+	display: none;
+}
+
+#adminmenu .toplevel_page_lukic-code-snippets .wp-menu-image:before {
+	content: '';
+}

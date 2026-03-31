@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
  * Direct inline styles for settings container.
- * Uses wp_add_inline_style() instead of inline <style> tag.
+ * Uses wp_add_inline_style() instead of emitting raw style tags.
  */
 function lukic_direct_inline_styles() {
 	wp_add_inline_style( 'Lukic-admin-styles', '

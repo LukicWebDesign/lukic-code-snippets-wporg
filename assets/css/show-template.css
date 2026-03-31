@@ -1,0 +1,28 @@
+#wp-admin-bar-Lukic-current-template {
+	background-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+#wp-admin-bar-Lukic-current-template .Lukic-template-label {
+	font-weight: 500;
+	color: #eee;
+}
+
+#wp-admin-bar-Lukic-current-template .Lukic-template-info {
+	font-family: Consolas, Monaco, monospace;
+	font-size: 12px;
+	padding: 0 5px;
+	color: #fff;
+}
+
+#wp-admin-bar-Lukic-current-template:hover .Lukic-template-info {
+	color: #00E1AF;
+}
+
+#wpadminbar .Lukic-template-node .ab-item:hover {
+	background-color: #32373c !important;
+	color: #00E1AF !important;
+}
+
+#wpadminbar .Lukic-template-node .ab-item:hover .Lukic-template-label {
+	color: #eee;
+}

@@ -1,0 +1,14 @@
+.manage-column.column-Lukic_file_size {
+	text-align: left;
+}
+
+.column-Lukic_file_size {
+	width: 10%;
+	text-align: left;
+}
+
+@media screen and (max-width: 782px) {
+	.column-Lukic_file_size {
+		text-align: left;
+	}
+}

@@ -1,0 +1,17 @@
+#wp-admin-bar-site-visibility-status > a.ab-item {
+	background-color: var(--lukic-site-visibility-indicator-bg) !important;
+	color: #fff !important;
+	font-weight: bold !important;
+}
+
+#wp-admin-bar-site-visibility-status > a.ab-item span:hover {
+	color: #fff !important;
+}
+
+#wp-admin-bar-top-secondary {
+	display: flex;
+}
+
+#wp-admin-bar-site-visibility-status {
+	order: -1;
+}

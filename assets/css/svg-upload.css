@@ -1,0 +1,10 @@
+.attachment-266x266,
+.thumbnail img {
+	width: 100% !important;
+	height: auto !important;
+}
+
+#postimagediv .inside img {
+	width: 100% !important;
+	height: auto !important;
+}

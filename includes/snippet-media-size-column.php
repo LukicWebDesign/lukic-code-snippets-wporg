@@ -115,36 +115,24 @@ function Lukic_media_size_orderby( $vars ) {
 add_filter( 'request', 'Lukic_media_size_orderby' );
 
 /**
- * Add custom CSS for the size column
+ * Enqueue custom CSS for the size column.
  */
 function Lukic_media_size_column_style() {
+	if ( ! function_exists( 'get_current_screen' ) ) {
+		return;
+	}
+
 	$screen = get_current_screen();
 
-	// Only add CSS on media library screen
 	if ( ! $screen || $screen->id !== 'upload' ) {
 		return;
 	}
 
-	?>
-	<style type="text/css">
-		/* Style for the Size column header */
-		.manage-column.column-Lukic_file_size {
-			text-align: left;
-		}
-		
-		/* Style for the Size column cells */
-		.column-Lukic_file_size {
-			width: 10%;
-			text-align: left;
-		}
-		
-		@media screen and (max-width: 782px) {
-			.column-Lukic_file_size {
-				text-align: left;
-			}
-		}
-	</style>
-	<?php
-if ( ! defined( 'ABSPATH' ) ) exit;
+	wp_enqueue_style(
+		'Lukic-media-size-column',
+		plugin_dir_url( __DIR__ ) . 'assets/css/media-size-column.css',
+		array(),
+		Lukic_SNIPPET_CODES_VERSION
+	);
 }
-add_action( 'admin_head', 'Lukic_media_size_column_style' );
+add_action( 'admin_enqueue_scripts', 'Lukic_media_size_column_style' );

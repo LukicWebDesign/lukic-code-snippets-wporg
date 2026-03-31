@@ -1,0 +1,52 @@
+body:not(.folded) #adminmenuback,
+body:not(.folded) #adminmenuwrap,
+body:not(.folded) #adminmenu,
+body:not(.folded) #adminmenu .wp-submenu {
+	width: var(--lukic-admin-menu-width) !important;
+}
+
+body:not(.folded) #wpcontent,
+body:not(.folded) #wpfooter {
+	margin-left: var(--lukic-admin-menu-content-margin) !important;
+}
+
+body:not(.folded) #adminmenu .wp-submenu {
+	left: var(--lukic-admin-menu-width) !important;
+}
+
+body:not(.folded) #adminmenu .wp-has-current-submenu .wp-submenu {
+	left: 0 !important;
+	width: 100% !important;
+	box-sizing: border-box;
+}
+
+body:not(.folded) #adminmenu .wp-submenu a {
+	padding-right: 10px;
+	word-wrap: break-word;
+	white-space: normal;
+}
+
+body:not(.folded) #adminmenu .wp-submenu .current a,
+body:not(.folded) #adminmenu .wp-submenu .current a:hover {
+	width: auto;
+	margin-right: 10px;
+}
+
+body:not(.folded) .block-editor__container .components-navigate-regions {
+	margin-left: calc(var(--lukic-admin-menu-width) * -1) !important;
+}
+
+body.folded #adminmenuback,
+body.folded #adminmenuwrap,
+body.folded #adminmenu {
+	width: var(--lukic-admin-menu-collapsed-width) !important;
+}
+
+body.folded #wpcontent,
+body.folded #wpfooter {
+	margin-left: var(--lukic-admin-menu-collapsed-margin) !important;
+}
+
+body.folded #adminmenu .wp-submenu {
+	left: var(--lukic-admin-menu-collapsed-width) !important;
+}

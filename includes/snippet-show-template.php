@@ -31,9 +31,8 @@ class Lukic_Show_Template {
 		// Add admin bar node
 		add_action( 'admin_bar_menu', array( $this, 'add_template_to_admin_bar' ), 1000 );
 
-		// Add styles for the admin bar item
-		add_action( 'wp_head', array( $this, 'add_custom_styles' ) );
-		add_action( 'admin_head', array( $this, 'add_custom_styles' ) );
+		// Add styles for the admin bar item.
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 	}
 
 	/**
@@ -142,40 +141,19 @@ class Lukic_Show_Template {
 	}
 
 	/**
-	 * Add custom styles for the admin bar template info
+	 * Enqueue styles for the admin bar template info.
 	 */
-	public function add_custom_styles() {
-		if ( ! is_admin_bar_showing() ) {
+	public function enqueue_styles() {
+		if ( ! is_admin_bar_showing() || is_admin() ) {
 			return;
 		}
 
-		?>
-		<style type="text/css">
-			#wp-admin-bar-Lukic-current-template {
-				background-color: rgba(0, 0, 0, 0.15) !important;
-			}
-			#wp-admin-bar-Lukic-current-template .Lukic-template-label {
-				font-weight: 500;
-				color: #eee;
-			}
-			#wp-admin-bar-Lukic-current-template .Lukic-template-info {
-				font-family: Consolas, Monaco, monospace;
-				font-size: 12px;
-				padding: 0 5px;
-				color: #fff;
-			}
-			#wp-admin-bar-Lukic-current-template:hover .Lukic-template-info {
-				color: #00E1AF;
-			}
-			#wpadminbar .Lukic-template-node .ab-item:hover {
-				background-color: #32373c !important;
-				color: #00E1AF !important;
-			}
-			#wpadminbar .Lukic-template-node .ab-item:hover .Lukic-template-label {
-				color: #eee;
-			}
-		</style>
-		<?php
+		wp_enqueue_style(
+			'Lukic-show-template',
+			plugin_dir_url( __DIR__ ) . 'assets/css/show-template.css',
+			array(),
+			Lukic_SNIPPET_CODES_VERSION
+		);
 	}
 }
 

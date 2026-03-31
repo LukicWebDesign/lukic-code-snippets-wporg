@@ -15,9 +15,6 @@ function Lukic_add_image_sizes_panel() {
 		return;
 	}
 
-	// Enqueue styles
-	add_action( 'admin_head', 'Lukic_image_sizes_panel_styles' );
-
 	// Add the panel to the sidebar
 	add_action( 'add_meta_boxes', 'Lukic_add_image_sizes_metabox' );
 }
@@ -96,49 +93,23 @@ function Lukic_display_image_sizes_metabox( $post ) {
 }
 
 /**
- * Add styles for the image sizes panel
+ * Enqueue styles for the image sizes panel.
  */
 function Lukic_image_sizes_panel_styles() {
-	?>
-	<style type="text/css">
-		/* Metabox styles */
-		#Lukic-image-sizes-metabox .inside {
-			padding: 0;
-			margin: 0;
-		}
-		
-		.Lukic-image-sizes-list {
-			padding: 12px;
-		}
-		
-		.Lukic-image-size-item {
-			display: flex;
-			justify-content: space-between;
-			padding: 5px 0;
-			border-bottom: 1px solid #f0f0f0;
-		}
-		
-		.Lukic-image-size-item:last-child {
-			border-bottom: none;
-		}
-		
-		.Lukic-image-size-name {
-			font-weight: 500;
-			color: #0073aa;
-			text-decoration: none;
-			display: inline-block;
-		}
-		
-		.Lukic-image-size-name:hover {
-			color: #00a0d2;
-			text-decoration: underline;
-		}
-		
-		.Lukic-image-size-dimensions {
-			color: #666;
-			font-size: 12px;
-		}
-	</style>
-	<?php
-if ( ! defined( 'ABSPATH' ) ) exit;
+	if ( ! function_exists( 'get_current_screen' ) ) {
+		return;
+	}
+
+	$screen = get_current_screen();
+	if ( ! $screen || $screen->base !== 'post' || $screen->post_type !== 'attachment' ) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'Lukic-image-sizes-panel',
+		plugin_dir_url( __DIR__ ) . 'assets/css/image-sizes-panel.css',
+		array(),
+		Lukic_SNIPPET_CODES_VERSION
+	);
 }
+add_action( 'admin_enqueue_scripts', 'Lukic_image_sizes_panel_styles' );

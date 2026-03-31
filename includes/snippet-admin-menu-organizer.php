@@ -29,8 +29,8 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 			// We use a very late priority to ensure we capture all registered menus
 			add_action( 'admin_menu', array( $this, 'apply_custom_menu' ), 9999 );
 			
-			// Add custom CSS for hidden items
-			add_action( 'admin_head', array( $this, 'output_custom_css' ) );
+			// Add custom CSS for hidden items.
+			add_action( 'admin_enqueue_scripts', array( $this, 'output_custom_css' ) );
 
 			// AJAX handler for saving settings
 			add_action( 'wp_ajax_lukic_save_menu_order', array( $this, 'save_settings' ) );
@@ -267,12 +267,14 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 
 			// Add class to show hidden items if toggled
 			if ( ! empty( $css ) ) {
-				echo '<style type="text/css">';
-				echo 'body:not(.show-all-menus) .wp-menu-separator { display: inherit; }'; // Fix separator visibility
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS is built from sanitized menu IDs
-				echo $css;
-				echo 'body.show-all-menus li.menu-top { display: block !important; }';
-				echo '</style>';
+				wp_register_style( 'Lukic-admin-menu-visibility', false, array(), Lukic_SNIPPET_CODES_VERSION );
+				wp_enqueue_style( 'Lukic-admin-menu-visibility' );
+				wp_add_inline_style(
+					'Lukic-admin-menu-visibility',
+					'body:not(.show-all-menus) .wp-menu-separator { display: inherit; }' .
+					$css .
+					'body.show-all-menus li.menu-top { display: block !important; }'
+				);
 			}
 		}
 

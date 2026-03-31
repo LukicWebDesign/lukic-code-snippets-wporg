@@ -22,7 +22,7 @@ class Lukic_Snippet_Codes_Settings {
 		add_action( 'wp_ajax_Lukic_auto_save_snippet', array( $this, 'ajax_auto_save_snippet' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_auto_save_script' ) );
-		add_action( 'admin_head', array( $this, 'add_menu_icon_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'add_menu_icon_styles' ) );
 	}
 
 	/**
@@ -327,26 +327,20 @@ class Lukic_Snippet_Codes_Settings {
 	 * Add custom menu icon styles
 	 */
 	public function add_menu_icon_styles() {
-
 		$icon_url = plugin_dir_url( __DIR__ ) . 'assets/icons/plugin-icon.svg';
-		?>
-		<style>
-			#adminmenu .toplevel_page_lukic-code-snippets .wp-menu-image {
-				background-repeat: no-repeat;
-				background-position: center center;
-				background-size: 20px auto;
-				background-image: url('<?php echo esc_url( $icon_url ); ?>');
-				filter: invert(67%) sepia(72%) saturate(459%) hue-rotate(121deg) brightness(97%) contrast(101%);
-			}
-			#adminmenu .toplevel_page_lukic-code-snippets .wp-menu-image img {
-				display: none;
-			}
-			#adminmenu .toplevel_page_lukic-code-snippets .wp-menu-image:before {
-				content: '';
-			}
-		</style>
-		<?php
-if ( ! defined( 'ABSPATH' ) ) exit;
+		$handle   = 'Lukic-menu-icon';
+
+		wp_register_style(
+			$handle,
+			plugin_dir_url( __DIR__ ) . 'assets/css/menu-icon.css',
+			array(),
+			Lukic_SNIPPET_CODES_VERSION
+		);
+		wp_enqueue_style( $handle );
+		wp_add_inline_style(
+			$handle,
+			'#adminmenu { --lukic-menu-icon-url: url("' . esc_url_raw( $icon_url ) . '"); }'
+		);
 	}
 
 	/**

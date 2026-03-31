@@ -255,8 +255,7 @@ class Lukic_Login_Page_Designer {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Inject custom CSS into the login page <head>.
-	 * Hooked to login_enqueue_scripts.
+	 * Enqueue custom CSS for the login page.
 	 */
 	public function inject_login_styles() {
 		$opts = wp_parse_args(
@@ -278,97 +277,46 @@ class Lukic_Login_Page_Designer {
 		// Logo width (min 40, max 320)
 		$logo_width = max( 40, min( 320, (int) $opts['logo_width'] ) );
 
-		?>
-		<style id="lukic-login-designer">
-			/* ── Background ── */
-			body.login {
-				<?php
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Values are predefined or explicitly validated integers/colors
-				echo $background_css; 
-				?>
+		$css  = "body.login {\n" . $background_css . "\n}\n";
+		$css .= "#login h1 a,\n.login h1 a {\n";
+		if ( ! empty( $opts['logo_url'] ) ) {
+			$css .= "background-image: url('" . esc_url_raw( $opts['logo_url'] ) . "');\n";
+			$css .= "background-size: contain;\n";
+			$css .= "background-repeat: no-repeat;\n";
+			$css .= "background-position: center bottom;\n";
+			$css .= 'width: ' . absint( $logo_width ) . "px;\n";
+			$css .= 'height: ' . absint( $logo_width ) . "px;\n";
+		}
+		$css .= "}\n";
+		$css .= "#login,\n.login .wp-login-logo + * {\n\tbackground: transparent;\n}\n";
+		$css .= "#loginform,\n#lostpasswordform,\n#registerform {\n";
+		$css .= "\tbackground-color: {$opts['card_bg_color']};\n";
+		$css .= "\tborder-radius: " . absint( $opts['card_border_radius'] ) . "px;\n";
+		$css .= "\tbox-shadow: {$card_shadow};\n";
+		$css .= "\tborder: none;\n}\n";
+		$css .= ".login label {\n\tcolor: {$opts['label_color']};\n}\n";
+		$css .= ".login #nav a,\n.login #backtoblog a {\n\tcolor: {$opts['link_color']};\n}\n";
+		$css .= ".login #nav a:hover,\n.login #backtoblog a:hover {\n\tcolor: {$opts['link_hover_color']};\n}\n";
+		$css .= "#nav a {\n\tcolor: {$opts['nav_color']} !important;\n}\n";
+		$css .= "#backtoblog a {\n\tcolor: {$opts['backtoblog_color']} !important;\n}\n";
+		$css .= ".login .button-primary,\n#wp-submit {\n";
+		$css .= "\tbackground-color: {$opts['btn_bg_color']} !important;\n";
+		$css .= "\tborder-color: {$opts['btn_bg_color']} !important;\n";
+		$css .= "\tcolor: {$opts['btn_text_color']} !important;\n";
+		$css .= "\tborder-radius: " . absint( $opts['btn_border_radius'] ) . "px !important;\n";
+		$css .= "\tbox-shadow: none !important;\n";
+		$css .= "\ttext-shadow: none !important;\n}\n";
+		$css .= ".login .button-primary:hover,\n#wp-submit:hover {\n";
+		$css .= "\tbackground-color: {$opts['btn_hover_bg_color']} !important;\n";
+		$css .= "\tborder-color: {$opts['btn_hover_bg_color']} !important;\n}\n";
 
-			}
+		if ( ! empty( $opts['custom_css'] ) ) {
+			$css .= wp_strip_all_tags( $opts['custom_css'] ) . "\n";
+		}
 
-			/* ── Logo ── */
-			#login h1 a,
-			.login h1 a {
-				<?php if ( ! empty( $opts['logo_url'] ) ) : ?>
-				background-image: url('<?php echo esc_url( $opts['logo_url'] ); ?>');
-				background-size: contain;
-				background-repeat: no-repeat;
-				background-position: center bottom;
-				width: <?php echo absint( $logo_width ); ?>px;
-				height: <?php echo absint( $logo_width ); ?>px;
-				<?php endif; ?>
-			}
-
-			/* ── Form card ── */
-			#login,
-			.login .wp-login-logo + * {
-				background: transparent;
-			}
-			#loginform,
-			#lostpasswordform,
-			#registerform {
-				background-color: <?php echo esc_attr( $opts['card_bg_color'] ); ?>;
-				border-radius: <?php echo absint( $opts['card_border_radius'] ); ?>px;
-				box-shadow: <?php echo esc_attr( $card_shadow ); ?>;
-				border: none;
-			}
-
-			/* ── Labels ── */
-			.login label {
-				color: <?php echo esc_attr( $opts['label_color'] ); ?>;
-			}
-
-			/* ── Links ── */
-			.login #nav a {
-				color: <?php echo esc_attr( $opts['link_color'] ); ?>;
-			}
-			.login #nav a:hover {
-				color: <?php echo esc_attr( $opts['link_hover_color'] ); ?>;
-			}
-			.login #backtoblog a {
-				color: <?php echo esc_attr( $opts['link_color'] ); ?>;
-			}
-			.login #backtoblog a:hover {
-				color: <?php echo esc_attr( $opts['link_hover_color'] ); ?>;
-			}
-
-			/* ── Nav & Back to Blog link text ── */
-			#nav a {
-				color: <?php echo esc_attr( $opts['nav_color'] ); ?> !important;
-			}
-			#backtoblog a {
-				color: <?php echo esc_attr( $opts['backtoblog_color'] ); ?> !important;
-			}
-
-			/* ── Submit button ── */
-			.login .button-primary,
-			#wp-submit {
-				background-color: <?php echo esc_attr( $opts['btn_bg_color'] ); ?> !important;
-				border-color: <?php echo esc_attr( $opts['btn_bg_color'] ); ?> !important;
-				color: <?php echo esc_attr( $opts['btn_text_color'] ); ?> !important;
-				border-radius: <?php echo absint( $opts['btn_border_radius'] ); ?>px !important;
-				box-shadow: none !important;
-				text-shadow: none !important;
-			}
-			.login .button-primary:hover,
-			#wp-submit:hover {
-				background-color: <?php echo esc_attr( $opts['btn_hover_bg_color'] ); ?> !important;
-				border-color: <?php echo esc_attr( $opts['btn_hover_bg_color'] ); ?> !important;
-			}
-
-			<?php if ( ! empty( $opts['custom_css'] ) ) : ?>
-			/* ── Custom CSS ── */
-			<?php 
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Allowed: plain CSS only
-			echo wp_strip_all_tags( $opts['custom_css'] ); 
-			?>
-
-			<?php endif; ?>
-		</style>
-		<?php
+		wp_register_style( 'lukic-login-designer', false, array(), Lukic_SNIPPET_CODES_VERSION );
+		wp_enqueue_style( 'lukic-login-designer' );
+		wp_add_inline_style( 'lukic-login-designer', $css );
 
 		// Override logo link & title if set
 		if ( ! empty( $opts['logo_link_url'] ) || ! empty( $opts['logo_alt_text'] ) ) {
@@ -385,7 +333,7 @@ class Lukic_Login_Page_Designer {
 	 * Build the CSS background properties based on bg_type.
 	 *
 	 * @param array $opts Settings.
-	 * @return string CSS declarations (safe to echo inside <style>).
+	 * @return string CSS declarations for wp_add_inline_style().
 	 */
 	private function build_background_css( $opts ) {
 		$css = '';
@@ -829,3 +777,4 @@ class Lukic_Login_Page_Designer {
 
 // Initialize the class.
 new Lukic_Login_Page_Designer();
+

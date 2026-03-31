@@ -19,8 +19,8 @@ if ( ! function_exists( 'Lukic_enable_svg_upload' ) ) {
 		// Sanitize SVG on upload for security
 		add_filter( 'wp_handle_upload_prefilter', 'Lukic_sanitize_svg' );
 
-		// Fix SVG display in media library
-		add_action( 'admin_head', 'Lukic_fix_svg_media_display' );
+		// Fix SVG display in media library.
+		add_action( 'admin_enqueue_scripts', 'Lukic_fix_svg_media_display' );
 
 		// Fix featured image display for SVGs
 		add_filter( 'wp_get_attachment_image_src', 'Lukic_fix_svg_size_attributes', 10, 4 );
@@ -101,25 +101,24 @@ if ( ! function_exists( 'Lukic_enable_svg_upload' ) ) {
 	}
 
 	/**
-	 * Fix SVG display in Media Library
+	 * Enqueue SVG display fixes for relevant admin screens.
 	 */
 	function Lukic_fix_svg_media_display() {
-		?>
-		<style type="text/css">
-			/* Make SVGs display properly in media library */
-			.attachment-266x266, .thumbnail img {
-				width: 100% !important;
-				height: auto !important;
-			}
-			
-			/* Ensure SVGs are properly sized in the featured image box */
-			#postimagediv .inside img {
-				width: 100% !important;
-				height: auto !important;
-			}
-		</style>
-		<?php
-if ( ! defined( 'ABSPATH' ) ) exit;
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+		if ( ! $screen || ! in_array( $screen->base, array( 'upload', 'post' ), true ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'Lukic-svg-upload',
+			plugin_dir_url( __DIR__ ) . 'assets/css/svg-upload.css',
+			array(),
+			Lukic_SNIPPET_CODES_VERSION
+		);
 	}
 
 	/**
