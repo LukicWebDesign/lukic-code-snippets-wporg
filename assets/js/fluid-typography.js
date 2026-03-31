@@ -132,8 +132,11 @@
             // Remove old style element if it exists
             $('#fluid-typography-preview-styles').remove();
             
-            // Create and append new style element
-            $('head').append('<style id="fluid-typography-preview-styles">' + cssCode + '</style>');
+            // Create and append a new style element without HTML string injection.
+            const styleElement = document.createElement('style');
+            styleElement.id = 'fluid-typography-preview-styles';
+            styleElement.textContent = cssCode;
+            document.head.appendChild(styleElement);
         }
     });
 })(jQuery);

@@ -266,8 +266,8 @@ class Lukic_Snippet_Registry {
 			'name'             => 'Login Page Designer',
 			'category'         => 'admin',
 			'tags'             => array( 'login', 'branding', 'design', 'customization' ),
-			'description'      => 'Visually customize the WordPress login page: logo, background, form card, colors, button styling, and custom CSS.',
-			'long_description' => 'A full visual designer for the WordPress login screen. Upload a custom logo, choose a solid color, image, or gradient background, style the form card with custom colors, border-radius and shadow, fine-tune label and link colors, fully style the submit button, and inject any extra CSS — all without touching any code.',
+			'description'      => 'Visually customize the WordPress login page with logo, background, form card, colors, and button styling.',
+			'long_description' => 'A full visual designer for the WordPress login screen. Upload a custom logo, choose a solid color, image, or gradient background, style the form card with custom colors, border-radius and shadow, fine-tune label and link colors, and fully style the submit button without touching code.',
 			'cleanup'          => array(
 				'options' => array( 'Lukic_login_page_designer_options' ),
 			),
@@ -301,8 +301,8 @@ class Lukic_Snippet_Registry {
 			'name'             => 'Custom Database Tables Manager',
 			'category'         => 'development',
 			'tags'             => array( 'database', 'tables' ),
-			'description'      => 'Create and manage custom database tables in your WordPress site without writing SQL code.',
-			'long_description' => 'A powerful tool for developers to create, edit, and manage custom database tables directly from the WordPress admin. You can define columns, data types, and manage table data without needing to use phpMyAdmin or write raw SQL queries.',
+			'description'      => 'Inspect, search, edit, and export database table data from the WordPress admin.',
+			'long_description' => 'A database utility for developers to inspect table structure, browse table rows, search validated columns, edit rows with a primary key, and export CSV data directly from the WordPress admin.',
 		),
 		'redirect_manager'        => array(
 			'file'             => 'snippet-redirect-manager.php',
@@ -388,19 +388,6 @@ class Lukic_Snippet_Registry {
 			'tags'             => array( 'comments', 'disable', 'spam', 'cleanup' ),
 			'description'      => 'Remove comment functionality across your WordPress site, helping reduce spam, moderation workload, and database clutter. Keeps WooCommerce product reviews intact.',
 			'long_description' => 'Globally disables the commenting system on your site. It removes comment forms from posts and pages, hides existing comments, and removes comment-related menu items and widgets. It intelligently preserves WooCommerce product reviews if you are running an online store.',
-		),
-		'debug_mode'              => array(
-			'file'             => 'snippet-debug-mode.php',
-			'name'             => 'Debug Mode',
-			'category'         => 'development',
-			'tags'             => array( 'debug', 'development', 'errors' ),
-			'warning'          => 'Performance Impact',
-			'description'      => 'Enable WordPress debugging tools safely. Logs errors to a file and provides a clean log viewer in the dashboard admin area.',
-			'long_description' => 'Provides a safe and clean way to monitor WordPress errors. How it works: When activated, it automatically updates your wp-config.php file to define WP_DEBUG and WP_DEBUG_LOG as true, while explicitly setting WP_DEBUG_DISPLAY to false to protect your frontend layout. It also registers a new "Debug Log Viewer" widget on your main WordPress dashboard, allowing you to easily read the contents of your debug.log file directly from the admin area without needing FTP access. When deactivated, it securely removes these modifications from wp-config.php.',
-			'lifecycle'        => array(
-				'activate'   => array( 'Lukic_Debug_Mode', 'activate_snippet' ),
-				'deactivate' => array( 'Lukic_Debug_Mode', 'deactivate_snippet' ),
-			),
 		),
 	);
 

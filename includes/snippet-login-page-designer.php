@@ -3,7 +3,7 @@
  * Login Page Designer snippet
  *
  * Allows full visual customization of the WordPress login page:
- * logo, background, form card, colors, button, and custom CSS.
+ * logo, background, form card, colors, and button styling.
  */
 
 // If this file is called directly, abort.

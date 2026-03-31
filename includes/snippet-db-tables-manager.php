@@ -118,6 +118,7 @@ class Lukic_DB_Tables_Manager {
 			.export-table:hover { background: var(--Lukic-primary-dark, #00c49a) !important; border-color: var(--Lukic-primary-dark, #00c49a) !important; }
 			.dataTables_length select { min-width: 80px !important; padding: 4px 25px 4px 8px !important; margin: 0 5px !important; border: 1px solid #ddd !important; border-radius: 4px !important; background: white !important; }
 			.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter { margin-bottom: 15px; }
+			#DataTables_Table_1_wrapper { padding-top: 10px; }
 			.view-table { background: var(--Lukic-primary, #00E1AF) !important; border-color: var(--Lukic-primary, #00E1AF) !important; color: white !important; border-radius: 4px !important; padding: 6px; font-weight: 600 !important; text-shadow: none !important; box-shadow: none !important; }
 			.view-table:hover { background: var(--Lukic-primary-dark, #00c49a) !important; border-color: var(--Lukic-primary-dark, #00c49a) !important; }
 			.Lukic-data-table { width: 100%; border-collapse: collapse; }
@@ -404,14 +405,8 @@ class Lukic_DB_Tables_Manager {
 		if ( ! $table ) {
 			wp_send_json_error( __( 'Invalid table specified.', 'lukic-code-snippets' ) );
 		}
-		$columns        = $this->get_safe_table_columns( $table );
-		$safe_table     = $this->quote_identifier( $table );
-		$select_columns = $this->get_safe_select_columns_sql( $columns );
 
-		// Get table structure — $table is validated by validate_table_name().
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		
-
+		// Use the cached validated schema for the structure response.
 		if ( empty( $columns ) ) {
 			wp_send_json_error( __( 'Could not retrieve table structure.', 'lukic-code-snippets' ) );
 		}
@@ -519,7 +514,7 @@ class Lukic_DB_Tables_Manager {
 		// Calculate total pages
 		$total_pages = (int) ceil( $total_rows / $per_page );
 
-		// Get table structure to identify primary key — $table is validated.
+		// Resolve the primary key from the validated schema cache.
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$primary_key = $primary_column ? $primary_column->Field : null;
 
@@ -677,7 +672,7 @@ class Lukic_DB_Tables_Manager {
 			wp_send_json_error( __( 'Missing required parameters.', 'lukic-code-snippets' ) );
 		}
 
-		// Get table structure — $table is validated by validate_table_name().
+		// Confirm the requested primary key exists in the validated schema cache.
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		if ( empty( $columns ) || '' === $select_columns || ! isset( $columns[ $primary_key ] ) ) {
 			wp_send_json_error( __( 'Invalid primary key.', 'lukic-code-snippets' ) );
@@ -707,7 +702,7 @@ class Lukic_DB_Tables_Manager {
 		wp_send_json_success(
 			array(
 				'row'         => $row,
-				'columns'     => $columns,
+				'columns'     => array_values( $columns ),
 				'primary_key' => $primary_key,
 			)
 		);
@@ -819,7 +814,7 @@ class Lukic_DB_Tables_Manager {
 			wp_send_json_error( __( 'Invalid table specified.', 'lukic-code-snippets' ) );
 		}
 
-		// Get table structure to build search query — $table is validated.
+		// Load the validated schema once for the search query path.
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$columns        = $this->get_safe_table_columns( $table );
 		$safe_table     = $this->quote_identifier( $table );

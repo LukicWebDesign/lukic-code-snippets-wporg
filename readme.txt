@@ -32,7 +32,7 @@ A modular performance toolkit: 40+ code snippets you toggle on and off — zero 
 * Admin Menu Organizer (drag-and-drop)
 * Show Active Plugins First
 * Word Counter
-* Login Page Designer (logo, background, colors, button, custom CSS, live preview)
+* Login Page Designer (logo, background, colors, button, live preview)
 
 **Content Management**
 * Enable Classic Editor
@@ -131,7 +131,7 @@ Yes. All UI strings use the `lukic-code-snippets` text domain with proper `__()`
 * Docs: Clarify Redirect Manager trailing slash URL usage rules.
 
 = 2.8.0 =
-* New: Login Page Designer snippet — full visual customization of the WordPress login page (logo, background, form card, colors, button, custom CSS) with a real-time live preview panel.
+* New: Login Page Designer snippet — full visual customization of the WordPress login page (logo, background, form card, colors, button) with a real-time live preview panel.
 * Security: Added `$wpdb->prepare()` for all LIMIT clauses in the Database Tables Manager.
 * Security: Fixed redirect delete bug caused by table name case mismatch.
 * Security: Escaped all dynamic class and `number_format()` output.

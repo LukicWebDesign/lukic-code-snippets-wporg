@@ -153,7 +153,7 @@
             const refreshMsg = typeof Lukic_auto_save.refreshing_message === 'undefined' ? '' : Lukic_auto_save.refreshing_message;
 
             const $notification = $('<div class="notice notice-info is-dismissible Lukic-auto-save-notice Lukic-refresh-notice">' +
-                '<p><span class="dashicons dashicons-update-alt" style="color: #00E1AF; animation: spin 1s linear infinite; margin-right: 8px;"></span>' +
+                '<p><span class="dashicons dashicons-update-alt" style="color: #00E1AF; animation: Lukic-spin 1s linear infinite; margin-right: 8px;"></span>' +
                 message + ' <span class="refresh-separator">•</span> ' + refreshMsg + '</p>' +
                 '</div>');
 
@@ -163,10 +163,6 @@
             // Add new notification after header
             $('.wpl-code-snippets-header').after($notification);
 
-            // Add CSS for the spinning icon
-            if (!$('#Lukic-refresh-css').length) {
-                $('head').append('<style id="Lukic-refresh-css">@keyframes spin { to { transform: rotate(360deg); } }</style>');
-            }
         }
 
         // Function to show notifications
