@@ -1,0 +1,423 @@
+/**
+ * Lukic Code Snippets - Image Attributes Editor
+ * CSS styles for the image attributes editor
+ */
+
+/* Header and Container Styles */
+.Lukic-admin-page {
+    max-width: 1400px;
+    box-sizing: border-box;
+    margin: 20px 0 0 0;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 0 !important;
+    padding-bottom: 50px !important;
+}
+
+.Lukic-header {
+    background-color: #212121;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.Lukic-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Lukic-header-logo img {
+    max-height: 60px;
+}
+
+.Lukic-header-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.Lukic-stat-box {
+    background-color: rgba(0, 225, 175, 0.2);
+    padding: 10px 15px;
+    border-radius: 4px;
+    text-align: center;
+    min-width: 100px;
+}
+
+.Lukic-stat-count {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    color: #00E1AF;
+}
+
+.Lukic-stat-label {
+    display: block;
+    color: #fff;
+    font-size: 14px;
+}
+
+.Lukic-container {
+    padding: 0 20px;
+    margin-bottom: 50px;
+}
+
+.Lukic-content-wrapper {
+    max-width: 100%;
+}
+
+.Lukic-card {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+}
+
+.Lukic-card-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.Lukic-card-header h2 {
+    margin: 0 0 10px 0;
+    color: #212121;
+    font-size: 1.5em;
+}
+
+.Lukic-description {
+    color: #666;
+    margin: 0;
+}
+
+.Lukic-card-body {
+    padding: 20px;
+}
+
+/* Table Styles */
+#Lukic-image-attributes-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+#Lukic-image-attributes-table th {
+    text-align: left;
+    padding: 15px 12px;
+    color: inherit;
+}
+
+#Lukic-image-attributes-table td {
+    padding: 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+#Lukic-image-attributes-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Checkbox Column Styles */
+.select-checkbox-column {
+    width: 30px;
+    text-align: center !important;
+}
+
+#Lukic-image-attributes-table td:first-child {
+    text-align: center;
+}
+
+#Lukic-image-attributes-table input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Bulk Edit Panel Styles */
+.Lukic-bulk-edit-panel {
+    background-color: #f9f9f9;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.Lukic-bulk-edit-panel h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: #212121;
+    font-size: 1.2em;
+}
+
+.bulk-edit-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+}
+
+.bulk-edit-field {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 10px;
+}
+
+.bulk-edit-field#caption {
+    margin-bottom: 15px;
+}
+
+.bulk-edit-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #212121;
+}
+
+.bulk-edit-field input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.bulk-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.Lukic-btn-secondary {
+    background-color: #e0e0e0;
+    color: #212121;
+}
+
+.Lukic-btn-secondary:hover {
+    background-color: #d0d0d0;
+}
+
+.Lukic-btn-loading {
+    opacity: 0.7;
+    cursor: wait;
+    position: relative;
+    padding-left: 32px !important;
+}
+
+.Lukic-btn-loading::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: Lukic-spin 1s linear infinite;
+}
+
+@keyframes Lukic-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Thumbnail Styles */
+.thumbnail-link {
+    display: block;
+    width: 80px;
+    height: 80px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.thumbnail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.thumbnail-link:hover .thumbnail-image {
+    transform: scale(1.1);
+}
+
+/* Editable Cell Styles */
+td[contenteditable=true] {
+    cursor: text;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+td[contenteditable=true]:hover {
+    background-color: #f0f0f0;
+}
+
+td[contenteditable=true]:focus {
+    outline: 2px solid #00E1AF;
+    background-color: #f9f9f9;
+}
+
+/* Status Indicators */
+.Lukic-editing {
+    opacity: 0.7;
+}
+
+.Lukic-saved {
+    position: relative;
+    animation: savedAnimation 1s ease;
+}
+
+.Lukic-error {
+    position: relative;
+    animation: errorAnimation 1s ease;
+}
+
+.Lukic-deleting {
+    opacity: 0.5;
+    background-color: #ffecec !important;
+}
+
+@keyframes savedAnimation {
+    0% {
+        background-color: transparent;
+    }
+
+    50% {
+        background-color: rgba(0, 225, 175, 0.2);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+@keyframes errorAnimation {
+    0% {
+        background-color: transparent;
+    }
+
+    50% {
+        background-color: rgba(255, 0, 0, 0.2);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+/* Delete Button Styles */
+.delete-image-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-image-btn:hover {
+    background-color: #c82333;
+}
+
+/* Edit Button Styles */
+.edit-image-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-image-btn:hover {
+    background-color: #0069d9;
+}
+
+/* Export Button Styles */
+.Lukic-export-options {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.Lukic-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #00E1AF;
+    color: #212121;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.Lukic-btn:hover {
+    background-color: #00c99d;
+}
+
+.Lukic-btn-secondary {
+    background-color: #f5f5f5;
+    color: #212121;
+    border: 1px solid #ddd;
+}
+
+.Lukic-btn-secondary:hover {
+    background-color: #e5e5e5;
+}
+
+/* DataTables Customization */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_processing,
+.dataTables_wrapper .dataTables_paginate {
+    margin-bottom: 15px;
+    color: #212121;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-left: 6px;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 10px;
+    width: 60px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border: 1px solid #ddd !important;
+    background: white !important;
+    border-radius: 4px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: #00E1AF !important;
+    color: #212121 !important;
+    border: 1px solid #00E1AF !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #f5f5f5 !important;
+    color: #212121 !important;
+    border: 1px solid #ddd !important;
+}
+
+/* Hide WordPress footer on our page */
+body.toplevel_page_Lukic-code-snippets #wpfooter,
+body.Lukic-code-snippets_page_Lukic-image-attributes-editor #wpfooter {
+    display: none !important;
+}

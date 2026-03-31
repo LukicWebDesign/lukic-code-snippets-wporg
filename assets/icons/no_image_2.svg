@@ -1,0 +1,15 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+	<title>New Project</title>
+	<defs>
+		<image  width="100" height="100" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAQMAAABKLAcXAAAAAXNSR0IB2cksfwAAAANQTFRF7u7ug0nRbQAAABhJREFUeJxjZEAGjKO8Ud4ob5Q3yqMxDwAZswBlkgbYQgAAAABJRU5ErkJggg=="/>
+	</defs>
+	<style>
+		tspan { white-space:pre } 
+		.t0 { font-size: 18px;fill: #262626;font-weight: 500;font-family: "Alexandria-Medium", "Alexandria" } 
+	</style>
+	<use id="Background" href="#img1" x="0" y="0"/>
+	<text id="No image" style="transform: matrix(1,0,0,1,5.401,54.712)" >
+		<tspan x="0" y="0" class="t0">No image
+</tspan>
+	</text>
+</svg>

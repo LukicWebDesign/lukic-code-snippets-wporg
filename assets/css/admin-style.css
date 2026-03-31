@@ -1,0 +1,1796 @@
+/* Lukic Snippet Codes Admin Styles - Legacy Support */
+/* This file provides backward compatibility and WordPress-specific styles */
+/* Main styling is now handled by variables.css and framework.css */
+
+
+
+/* Custom Admin Notifications */
+/* Target WordPress notifications */
+.wp-core-ui .notice,
+.wp-core-ui div.updated,
+.wp-core-ui div.error,
+.wp-core-ui .notice-success,
+.wp-core-ui .notice-warning,
+.wp-core-ui .notice-error,
+.wp-core-ui .notice-info,
+.wp-core-ui .notice.is-dismissible {
+    position: absolute;
+    top: var(--Lukic-space-5);
+    right: var(--Lukic-space-5);
+    max-width: 350px;
+    min-width: 300px;
+    z-index: var(--Lukic-z-toast);
+    box-shadow: var(--Lukic-shadow-lg);
+    border-left: var(--Lukic-notification-border-width) solid var(--Lukic-primary);
+    border-radius: var(--Lukic-border-radius);
+    animation: Lukic-slide-in var(--Lukic-transition-normal) ease-out;
+    margin: 0 0 var(--Lukic-space-4) 0;
+}
+
+
+.lcs-edit-btn {
+    background-color: var(--lukic-blue);
+    color: var(--Lukic-white);
+    border-radius: var(--Lukic-border-radius);
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.lcs-delete-btn {
+    background-color: var(--lukic-red);
+    color: var(--Lukic-white);
+    border-radius: var(--Lukic-border-radius);
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.lcs-edit-btn:hover,
+.lcs-delete-btn:hover {
+    color: var(--Lukic-white);
+}
+
+.wp-core-ui .notice-success {
+    background-color: #f0fff9;
+    border-left-color: var(--Lukic-primary);
+}
+
+.wp-core-ui .notice-error {
+    background-color: #fff0f0;
+    border-left-color: #dc3232;
+}
+
+.wp-core-ui .notice-warning {
+    background-color: #fffbea;
+    border-left-color: #ffb900;
+}
+
+.wp-core-ui .notice-info {
+    background-color: #f0f6ff;
+    border-left-color: #00a0d2;
+}
+
+.wp-core-ui .notice p {
+    margin: 0.5em 0;
+    padding: 2px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+@keyframes Lukic-slide-in {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.Lukic-auto-save-notice {
+    margin: 10px 0 !important;
+    animation: slideInDown 0.3s ease-out;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.Lukic-auto-save-notice p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0.5em 0;
+    display: flex;
+    align-items: center;
+}
+
+.Lukic-auto-save-notice .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.Lukic-refresh-notice {
+    border-left-color: #00E1AF !important;
+    background-color: #f0fdfa !important;
+}
+
+.Lukic-refresh-notice p {
+    color: #047857 !important;
+    font-weight: 500;
+}
+
+.Lukic-refresh-notice .refresh-separator {
+    margin: 0 6px;
+    color: #00E1AF;
+    font-weight: bold;
+}
+
+.notice-success .dashicons-yes-alt {
+    color: #46b450;
+}
+
+.notice-error .dashicons-warning {
+    color: #dc3232;
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Auto-hide notifications after 5 seconds */
+.wp-core-ui .notice.is-dismissible {
+    animation: Lukic-slide-in 0.4s ease-out, Lukic-fade-out 0.5s ease-in 5s forwards;
+}
+
+/* Settings page specific styles */
+.Lukic-settings-container {
+    background: var(--Lukic-white);
+    border-radius: var(--Lukic-border-radius-lg);
+    box-shadow: var(--Lukic-shadow);
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+/* Filter controls styling */
+.Lukic-filter-controls {
+    padding: var(--Lukic-space-6);
+    border-bottom: var(--Lukic-border-width) solid var(--Lukic-gray-200);
+    background: var(--Lukic-gray-50);
+}
+
+.Lukic-search-bar {
+    position: relative;
+    max-width: 400px;
+}
+
+.Lukic-search-bar input[type="text"] {
+    width: 100%;
+    padding: var(--Lukic-space-3) var(--Lukic-space-10) var(--Lukic-space-3) var(--Lukic-space-4);
+    border: var(--Lukic-border-width) solid var(--Lukic-gray-300);
+    border-radius: var(--Lukic-border-radius);
+    font-size: var(--Lukic-text-base);
+    font-family: var(--Lukic-font-family);
+    transition: var(--Lukic-transition-fast);
+}
+
+.Lukic-search-bar input[type="text"]:focus {
+    outline: none;
+    border-color: var(--Lukic-primary);
+    box-shadow: 0 0 0 3px var(--Lukic-primary-focus);
+}
+
+.Lukic-search-icon {
+    position: absolute;
+    right: var(--Lukic-space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--Lukic-gray-400);
+    pointer-events: none;
+    font-size: var(--Lukic-text-base);
+}
+
+/* Filter buttons */
+.Lukic-filter-buttons {
+    display: flex;
+    gap: var(--Lukic-space-2);
+    margin-top: var(--Lukic-space-4);
+    flex-wrap: wrap;
+}
+
+.Lukic-filter-btn {
+    padding: var(--Lukic-space-2) var(--Lukic-space-4);
+    background: var(--Lukic-white);
+    border: var(--Lukic-border-width) solid var(--Lukic-gray-300);
+    border-radius: var(--Lukic-border-radius-full);
+    color: var(--Lukic-gray-700);
+    font-size: var(--Lukic-text-sm);
+    font-weight: var(--Lukic-font-medium);
+    cursor: pointer;
+    transition: var(--Lukic-transition-fast);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.Lukic-filter-btn:hover,
+.Lukic-filter-btn.active {
+    background: var(--Lukic-primary);
+    color: var(--Lukic-white);
+    border-color: var(--Lukic-primary);
+    text-decoration: none;
+}
+
+@keyframes Lukic-fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        display: none;
+    }
+}
+
+/* Settings page container */
+.Lukic-settings-wrap {
+    margin: 20px 20px 0 0;
+    max-width: 1400px;
+    box-sizing: border-box;
+}
+
+.Lukic-wrap {
+    font-family: var(--Lukic-font-family);
+    margin: 20px 20px 0 0;
+    max-width: 1400px;
+    box-sizing: border-box;
+}
+
+/* Header styles */
+.Lukic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 0;
+    border: none;
+}
+
+.Lukic-header-logo {
+    flex: 1;
+}
+
+.Lukic-header-logo h2 {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    color: #23282d;
+}
+
+.Lukic-header-logo p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.Lukic-header-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.Lukic-header-stats {
+    display: flex;
+    gap: 15px;
+}
+
+.Lukic-stat-box {
+    background: white;
+    border-radius: 6px;
+    padding: 15px 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0;
+    transition: transform 0.2s;
+}
+
+.Lukic-stat-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.Lukic-stat-count {
+    display: block;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--Lukic-primary);
+    margin-bottom: 5px;
+}
+
+.Lukic-stat-label {
+    display: block;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Settings intro and search */
+.Lukic-settings-intro {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.Lukic-filter-area {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.Lukic-filter-controls {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.Lukic-tag-buttons-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+
+}
+
+.Lukic-tag-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+}
+
+.Lukic-tag-button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    background: #f5f5f5;
+    color: #555;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-align: center;
+}
+
+.Lukic-tag-button:hover {
+    background: var(--Lukic-primary);
+    color: #fff;
+}
+
+.Lukic-tag-button.active {
+    background: var(--Lukic-primary);
+    color: #fff;
+}
+
+.Lukic-search-box {
+    position: relative;
+    flex: 1;
+    margin-right: 15px;
+}
+
+.Lukic-search-box input {
+    width: 100%;
+    padding: 8px 15px;
+    padding-right: 35px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.Lukic-search-box .dashicons {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777;
+}
+
+.Lukic-tag-filter select {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    min-width: 150px;
+    height: auto;
+    font-size: 14px;
+}
+
+/* Tag specific styles */
+.Lukic-snippet-tags,
+.Lukic-tags {
+    display: flex;
+    flex-wrap: wrap;
+    /* ensuring wrapping */
+    gap: 5px;
+    row-gap: 8px;
+    /* Added row gap */
+}
+
+.Lukic-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    /* Default gap for potential icons */
+    background: #f0f0f0;
+    border-radius: 3px;
+    padding: 2px 8px;
+    font-size: 12px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+    /* Normalizing line height */
+    vertical-align: middle;
+}
+
+.Lukic-tag:hover {
+    background: var(--Lukic-primary);
+    color: #fff;
+}
+
+/* Specific styling for warning tags using variables.css colors */
+.Lukic-tag--warning {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background-color: var(--Lukic-error-light);
+    color: var(--Lukic-error);
+    border: 1px solid var(--Lukic-error);
+    font-weight: 600;
+}
+
+.Lukic-tag--warning .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -1px;
+    /* Subtle pixel nudge for Dashicons alignment */
+}
+
+.Lukic-tag--warning:hover {
+    background-color: var(--Lukic-error);
+    color: var(--Lukic-white);
+}
+
+/* Search and filter controls */
+.Lukic-search-box,
+.Lukic-tag-filter {
+    flex: 1;
+    margin: 5px;
+    max-width: 300px;
+}
+
+.Lukic-tag-filter select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Settings Container styles */
+.Lukic-settings-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 9;
+    box-sizing: border-box;
+    max-width: 1400px;
+}
+
+.Lukic-settings-container h3 {
+    color: #23282d;
+    font-size: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 12px;
+    margin-top: 0;
+}
+
+/* Table styles */
+.Lukic-snippets-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.Lukic-snippets-table th {
+    text-align: left;
+    padding: 10px 15px;
+    border-bottom: 2px solid #ddd;
+    color: #23282d;
+    font-weight: 600;
+}
+
+.Lukic-snippets-table th:last-child {
+    text-align: center;
+}
+
+.Lukic-snippet-row {
+    border-bottom: 1px solid #eee;
+}
+
+.Lukic-snippet-row:last-child {
+    border-bottom: none;
+}
+
+.Lukic-snippet-row td {
+    padding: 15px;
+    vertical-align: middle;
+}
+
+.Lukic-snippet-name {
+    width: 25%;
+}
+
+.Lukic-snippet-description {
+    width: 100%;
+    color: #666;
+}
+
+/* Search bar styling */
+.Lukic-filter-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.Lukic-search-bar {
+    position: relative;
+    max-width: 250px;
+    width: 100%;
+    margin-right: 30px;
+}
+
+#snippet-search {
+    padding: 6px 10px;
+    padding-right: 30px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.Lukic-search-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 16px;
+}
+
+.Lukic-snippet-toggle {
+    width: 15%;
+    text-align: center;
+}
+
+.Lukic-no-search-results {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+}
+
+/* Submit button area */
+.Lukic-submit-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.Lukic-submit-container .button-primary {
+    background: var(--Lukic-primary);
+    border-color: var(--Lukic-primary-hover);
+    box-shadow: 0 2px 5px rgba(0, 225, 175, 0.2);
+    padding: 5px 20px;
+    height: auto;
+    line-height: 2;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.Lukic-submit-container .button-primary:hover,
+.Lukic-submit-container .button-primary:focus,
+.Lukic-submit-container .button-primary:active {
+    background: var(--Lukic-primary-hover);
+    box-shadow: 0 4px 8px rgba(0, 225, 175, 0.3);
+    border: none;
+}
+
+.Lukic-submit-container .description {
+    color: #666;
+    font-style: italic;
+    margin: 0;
+}
+
+/* Footer */
+.Lukic-footer {
+    margin-top: 30px;
+    padding: 15px 0;
+    border-top: 1px solid #eee;
+    text-align: center;
+    color: #666;
+    font-size: 13px;
+}
+
+.Lukic-footer a {
+    color: var(--Lukic-primary);
+    text-decoration: none;
+}
+
+.Lukic-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Toggle switch */
+.Lukic-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.Lukic-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.Lukic-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.Lukic-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked+.Lukic-slider {
+    background-color: var(--Lukic-primary);
+}
+
+input:focus+.Lukic-slider {
+    box-shadow: 0 0 1px var(--Lukic-primary);
+}
+
+input:checked+.Lukic-slider:before {
+    transform: translateX(26px);
+}
+
+/* Checkbox and form field styles */
+.Lukic-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.Lukic-checkbox-label {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 10px 15px;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    border: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+}
+
+.Lukic-checkbox-label:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.Lukic-checkbox-label input[type="checkbox"] {
+    border-color: #b4b9be;
+    box-shadow: none;
+    border-radius: 3px;
+}
+
+.Lukic-checkbox-label input[type="checkbox"]:checked {
+    border-color: var(--Lukic-primary);
+}
+
+.Lukic-checkbox-text {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #444;
+}
+
+.Lukic-checkbox-text .field-type {
+    opacity: 0.7;
+    font-size: 12px;
+    margin-left: 5px;
+    color: #666;
+    font-style: italic;
+}
+
+.Lukic-settings-section {
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.Lukic-section-header {
+    background-color: #f8f8f8;
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.Lukic-section-header h4 {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #23282d;
+}
+
+.Lukic-empty-state {
+    padding: 40px 30px;
+    text-align: center;
+    background-color: #f8f8f8;
+    border-radius: 6px;
+    margin: 15px 0;
+    color: #666;
+    border: 1px dashed #ddd;
+}
+
+/* Content Order styles */
+.Lukic-content-order {
+    padding: 20px 0;
+    max-width: 1400px;
+    box-sizing: border-box;
+}
+
+.Lukic-content-order-instructions {
+    background: #fff;
+    border-left: 4px solid #00E1AF;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    margin: 20px 0;
+    padding: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    display: flex;
+    align-content: center;
+}
+
+.Lukic-content-order-instructions:before {
+    content: "✓";
+    display: inline-block;
+    margin-right: 5px;
+    color: #00E1AF;
+    font-weight: bold;
+}
+
+.Lukic-content-order-status {
+    background: #fff;
+    border-left: 4px solid #00a0d2;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    margin: 10px 0;
+    padding: 12px;
+    display: none;
+    font-weight: 500;
+}
+
+.Lukic-content-order-status.loading {
+    border-left-color: #ffb900;
+}
+
+.Lukic-content-order-status.success {
+    border-left-color: #46b450;
+}
+
+.Lukic-content-order-status.error {
+    border-left-color: #dc3232;
+}
+
+.Lukic-content-order-list {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    min-height: 60px;
+    /* Ensures list is draggable even when empty */
+    position: relative;
+    /* For the after pseudo-element */
+}
+
+.Lukic-content-order-list:before {
+    display: none;
+}
+
+.Lukic-content-order-list:after {
+    content: "Drag items to change their order";
+    display: block;
+    padding: 10px 15px;
+    background: #f9f9f9;
+    border-top: 1px solid #e5e5e5;
+    color: #555;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version */
+    border-left: 3px solid transparent;
+}
+
+.Lukic-content-order-item:active {
+    cursor: grabbing;
+}
+
+.Lukic-content-order-item:last-child {
+    border-bottom: 0;
+}
+
+.Lukic-content-order-item:hover {
+    background-color: #f9f9f9;
+    border-left-color: #00E1AF;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transform: translateX(2px);
+}
+
+.Lukic-content-order-item.ui-sortable-helper {
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid #00E1AF;
+    border-left: 3px solid #00E1AF;
+    z-index: 100;
+    cursor: grabbing;
+    transform: rotate(1deg) scale(1.01);
+}
+
+.Lukic-content-order-placeholder {
+    background-color: #f0f8ff !important;
+    border: 2px dashed #00E1AF !important;
+    visibility: visible !important;
+    height: 60px !important;
+    margin: 5px 0;
+}
+
+.Lukic-content-order-handle {
+    color: #aaa;
+    font-size: 20px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: #f8f8f8;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+    position: relative;
+}
+
+.Lukic-content-order-item:hover .Lukic-content-order-handle {
+    color: #00E1AF;
+    background: #f1f1f1;
+}
+
+.Lukic-content-order-number {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background: #f8f8f8;
+    border-radius: 50%;
+    margin-right: 15px;
+    color: #555;
+    font-weight: 600;
+}
+
+.Lukic-content-order-title {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 500;
+    margin-right: 10px;
+    /* Ensure space for action links */
+}
+
+
+.Lukic-content-order-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.Lukic-content-order-item .row-actions {
+    position: absolute;
+    right: 90px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.Lukic-content-order-item:hover .row-actions {
+    opacity: 1;
+}
+
+.Lukic-content-order-item .row-actions span {
+    padding: 0 6px;
+    border-right: 1px solid #ddd;
+    color: #666;
+}
+
+.Lukic-content-order-item .row-actions span:last-child {
+    border-right: 0;
+}
+
+.drag-tip {
+    color: #aaa;
+    font-style: italic;
+    font-size: 12px;
+    margin-left: auto;
+    /* Push to the right */
+    padding: 3px 8px;
+    background: #f8f8f8;
+    border-radius: 3px;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: color 0.2s, background 0.2s;
+}
+
+.Lukic-content-order-item:hover .drag-tip {
+    color: #00E1AF;
+    background: #f1f1f1;
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 782px) {
+    .Lukic-content-order-item {
+        flex-wrap: wrap;
+        padding: 12px 10px;
+    }
+
+    .Lukic-content-order-title {
+        flex: 100%;
+        margin: 8px 0;
+        order: 2;
+    }
+
+    .Lukic-content-order-number {
+        order: 1;
+        margin-right: 10px;
+    }
+
+    .Lukic-content-order-handle {
+        order: 1;
+        margin-right: 0;
+        margin-left: auto;
+    }
+
+    .Lukic-content-order-item .row-actions {
+        position: static;
+        display: block;
+        opacity: 1;
+        margin-top: 8px;
+        order: 3;
+        flex: 100%;
+    }
+
+    .Lukic-content-order-children {
+        margin-top: 8px;
+        display: block;
+        order: 4;
+        flex: 100%;
+    }
+
+    .Lukic-content-order-item {
+        padding: 12px 10px;
+    }
+
+    .Lukic-content-order-handle {
+        margin-right: 10px;
+        padding: 8px;
+    }
+
+    .Lukic-content-order-title {
+        font-size: 14px;
+        max-width: 60%;
+    }
+
+    .Lukic-content-order-item .row-actions {
+        position: relative;
+        right: auto;
+        padding-top: 5px;
+        display: block;
+        opacity: 1;
+    }
+
+    .drag-tip {
+        font-size: 11px;
+        padding: 2px 6px;
+        right: 10px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .drag-tip {
+        display: none;
+        /* Hide on very small screens to avoid clutter */
+    }
+
+    .Lukic-content-order-list:after {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+    .Lukic-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .Lukic-header-stats {
+        width: 100%;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .Lukic-checkbox-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .Lukic-submit-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .Lukic-submit-container .description {
+        margin-top: 10px;
+    }
+
+    .Lukic-content-order-item {
+        flex-wrap: wrap;
+        padding: 12px 10px;
+    }
+
+    .Lukic-content-order-item .Lukic-content-order-title {
+        width: 80%;
+        margin-bottom: 5px;
+    }
+
+    .Lukic-content-order-item .Lukic-content-order-preview {
+        width: 100%;
+        margin-left: 25px;
+    }
+}
+
+/* Fluid Typography Calculator Styles */
+.Lukic-fluid-typography-wrap {
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 1400px;
+    box-sizing: border-box;
+}
+
+.Lukic-fluid-typography-wrap h1 {
+    margin-bottom: 20px;
+    font-size: 28px;
+    color: #444;
+}
+
+.Lukic-settings-intro {
+    background-color: #fff;
+    padding: 20px;
+    border-left: 4px solid var(--Lukic-primary);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
+    margin-bottom: 25px;
+}
+
+.Lukic-fluid-calculator {
+    background: #fff;
+    padding: 25px;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
+    margin-bottom: 30px;
+}
+
+.Lukic-calculator-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.Lukic-calculator-column {
+    flex: 1;
+    min-width: 250px;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.Lukic-calculator-column h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #444;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 10px;
+}
+
+.Lukic-input-group {
+    margin-bottom: 15px;
+}
+
+.Lukic-input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.Lukic-input-group input[type="number"],
+.Lukic-input-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.Lukic-input-group input[type="number"]:focus,
+.Lukic-input-group select:focus {
+    border-color: var(--Lukic-primary);
+    box-shadow: 0 0 0 1px var(--Lukic-primary-focus);
+    outline: none;
+}
+
+.Lukic-calculate-btn-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.Lukic-calculate-btn-container .button-primary {
+    background: var(--Lukic-primary);
+    border-color: var(--Lukic-primary);
+    box-shadow: 0 1px 0 var(--Lukic-primary-hover);
+    padding: 8px 25px;
+    height: auto;
+    font-size: 15px;
+}
+
+.Lukic-calculate-btn-container .button-primary:hover,
+.Lukic-calculate-btn-container .button-primary:focus,
+.Lukic-calculate-btn-container .button-primary:active {
+    background: var(--Lukic-primary-hover);
+}
+
+/* Active snippet visual indicator */
+.Lukic-snippet.snippet-active {
+    background: linear-gradient(90deg, rgba(0, 225, 175, 0.05) 0%, transparent 100%);
+}
+
+
+.Lukic-snippet.snippet-active:hover {
+    border: 1px solid var(--Lukic-primary);
+}
+
+
+.Lukic-snippet.snippet-active h3 {
+    color: var(--Lukic-primary);
+}
+
+.Lukic-results-container {
+    background: #fff;
+    padding: 25px;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
+    display: none;
+    /* Initially hidden, shown by JS */
+}
+
+.Lukic-results-container h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: #444;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 10px;
+}
+
+.Lukic-preview-container,
+.Lukic-code-container {
+    margin-bottom: 30px;
+}
+
+.Lukic-preview-container h3,
+.Lukic-code-container h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #444;
+}
+
+.Lukic-typography-preview {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.Lukic-typography-preview p {
+    margin: 10px 0;
+}
+
+.code-display-container {
+    position: relative;
+}
+
+.Lukic-code-display {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    overflow-x: auto;
+    font-family: monospace;
+    white-space: pre-wrap;
+    margin-bottom: 10px;
+}
+
+.code-display-container .button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #f1f1f1;
+    border-color: #ccc;
+}
+
+.code-display-container .button:hover {
+    background: #e9e9e9;
+}
+
+table.dataTable thead th,
+table.dataTable thead td {
+    border-bottom: 1px solid var(--Lukic-primary) !important;
+}
+
+/* Responsive styles for fluid typography page */
+@media screen and (max-width: 782px) {
+    .Lukic-calculator-columns {
+        flex-direction: column;
+    }
+
+    .Lukic-calculator-column {
+        min-width: 100%;
+    }
+}
+
+/* Snippet page hero header */
+.wpl-code-snippets-header {
+    background: var(--Lukic-dark-bg, #272727);
+    border-radius: var(--Lukic-border-radius, 0.25rem);
+    margin-bottom: var(--Lukic-space-5, 1.25rem);
+    padding: var(--Lukic-space-5, 1.25rem);
+    color: var(--Lukic-white, #ffffff);
+}
+
+.wpl-code-snippets-header__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--Lukic-space-4, 1rem);
+    flex-wrap: wrap;
+}
+
+.wpl-code-snippets-header__brand h2 {
+    color: inherit;
+    font-size: 2.5rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.wpl-code-snippets-header__brand h2 span {
+    color: var(--Lukic-primary, #00E1AF);
+}
+
+.wpl-code-snippets-header__stats {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.wpl-code-snippets-header__stats-item {
+    background: var(--Lukic-dark-surface, #444444);
+    color: var(--Lukic-white, #ffffff);
+    padding: 15px 20px;
+    border-radius: var(--Lukic-border-radius, 0.25rem);
+    text-align: center;
+    min-width: 100px;
+}
+
+.wpl-code-snippets-header__stats-item-count {
+    color: var(--Lukic-primary, #00E1AF);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* Snippet categories and cards */
+.Lukic-category {
+    margin-bottom: 30px;
+}
+
+.Lukic-category-header {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.Lukic-category-header h2 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.Lukic-category-header h2 .dashicons {
+    color: var(--Lukic-primary, #00E1AF);
+}
+
+.Lukic-snippets {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.Lukic-snippet {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+    transition: all .3s ease;
+    position: relative;
+}
+
+.Lukic-snippet:hover {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, .1);
+    border-color: #ddd;
+}
+
+.Lukic-snippet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.Lukic-snippet-header h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.Lukic-snippet-description p {
+    margin-top: 0;
+    color: #555;
+    font-size: 14px;
+}
+
+.Lukic-tags {
+    margin-top: 10px;
+}
+
+.Lukic-tag {
+    display: inline-flex;
+    background: #f5f5f5;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #555;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.Lukic-tag-filter {
+    min-width: 200px;
+}
+
+.Lukic-tag-filter select {
+    width: 100%;
+    height: 40px;
+}
+
+.Lukic-tag-buttons {
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.Lukic-tag-button {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.Lukic-tag-button:hover {
+    background: #e5e5e5;
+}
+
+.Lukic-tag-button.active {
+    background: var(--Lukic-primary, #00E1AF);
+    color: #fff;
+}
+
+.Lukic-filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: end;
+}
+
+.Lukic-search-bar {
+    position: relative;
+    flex: 1 1 250px;
+}
+
+.Lukic-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.Lukic-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.Lukic-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.Lukic-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.Lukic-switch input:checked+.Lukic-slider {
+    background-color: var(--Lukic-primary, #00E1AF);
+}
+
+.Lukic-switch input:checked+.Lukic-slider:before {
+    transform: translateX(22px);
+}
+
+.Lukic-switch.loading .Lukic-slider {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.Lukic-switch.loading .Lukic-slider:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: Lukic-spin 1s linear infinite;
+}
+
+@keyframes Lukic-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.Lukic-support-container {
+    max-width: 800px;
+}
+
+.Lukic-support-section {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.Lukic-support-section h3 {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.Lukic-support-section h3 .dashicons {
+    color: var(--Lukic-primary, #00E1AF);
+}
+
+.Lukic-support-section .button {
+    background-color: var(--Lukic-primary, #00E1AF);
+    border-color: var(--Lukic-primary, #00E1AF);
+    color: #fff;
+}
+
+.Lukic-support-section .button:hover {
+    background-color: #00d1a0;
+    border-color: #00d1a0;
+}
+
+@media screen and (max-width: 782px) {
+    .Lukic-snippets {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Security Headers */
+.Lukic-security-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 20px;
+}
+
+@media (max-width: 900px) {
+    .Lukic-security-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.Lukic-security-card {
+    border: 1px solid #e5e7eb;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.Lukic-security-card.is-active {
+    border-color: var(--Lukic-primary, #00E1AF);
+    box-shadow: 0 8px 30px rgba(0, 225, 175, 0.15);
+}
+
+.Lukic-security-card .Lukic-card-header {
+    align-items: flex-start;
+}
+
+.Lukic-security-card .Lukic-description {
+    margin-bottom: 12px;
+}
+
+.Lukic-security-card .Lukic-field-control label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.Lukic-security-card .Lukic-input {
+    width: 100%;
+}
+
+.Lukic-field-row--inline {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.Lukic-field-text {
+    flex: 1;
+}
+
+.Lukic-url-input-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.Lukic-url-prefix,
+.Lukic-url-suffix {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.Lukic-input--slug {
+    max-width: 220px;
+}
+
+.Lukic-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.Lukic-btn,
+.button.Lukic-btn {
+    border-radius: var(--Lukic-border-radius, 0.25rem);
+    padding: var(--Lukic-btn-padding, 8px 16px);
+    font-weight: var(--Lukic-font-medium, 600);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.Lukic-btn--primary,
+.button.Lukic-btn--primary {
+    background: var(--Lukic-primary, #00E1AF) !important;
+    border-color: var(--Lukic-primary, #00E1AF) !important;
+    color: #fff !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 225, 175, 0.25);
+}
+
+.Lukic-btn--primary:hover,
+.button.Lukic-btn--primary:hover {
+    background: var(--Lukic-primary-hover, #00c99e) !important;
+    border-color: var(--Lukic-primary-hover, #00c99e) !important;
+}
+
+.Lukic-btn--secondary,
+.button.Lukic-btn--secondary {
+    background: #f5f5f5 !important;
+    border: 1px solid #d9d9d9 !important;
+    color: #23282d !important;
+}
+
+.Lukic-btn--secondary:hover,
+.button.Lukic-btn--secondary:hover {
+    background: #ededed !important;
+}
+
+.Lukic-btn.is-loading,
+.button.Lukic-btn.is-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.Lukic-test-results {
+    margin-top: 25px;
+    padding: 20px;
+    display: none;
+}
+
+.Lukic-test-results h2 {
+    margin-top: 0;
+}
+
+.header-test-result {
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #e5e7eb;
+    background: #f9fafb;
+    margin-bottom: 12px;
+}
+
+.header-test-result.success {
+    border-left-color: #10b981;
+}
+
+.header-test-result.error {
+    border-left-color: #dc2626;
+}
+
+.header-test-result__title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.header-test-result__status {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+
+.header-test-result__value {
+    font-size: 13px;
+    color: #4b5563;
+}
+
+/* WordPress Core UI Button Overrides (Scoped strictly to Lukic plugin) */
+/* Apply padding to ALL buttons */
+.Lukic-settings-wrap .button,
+.Lukic-wrap .button {
+    padding: 8px 20px;
+    height: auto;
+    line-height: normal;
+}
+
+/* Color overrides specifically for secondary/default buttons */
+.Lukic-settings-wrap .button:not(.button-primary),
+.Lukic-settings-wrap .button-secondary,
+.Lukic-wrap .button:not(.button-primary),
+.Lukic-wrap .button-secondary {
+    border-color: var(--Lukic-dark-surface, #444444);
+    color: var(--Lukic-dark-surface, #444444);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.Lukic-settings-wrap .button:not(.button-primary):hover,
+.Lukic-settings-wrap .button-secondary:hover,
+.Lukic-settings-wrap .button:not(.button-primary):focus,
+.Lukic-settings-wrap .button-secondary:focus,
+.Lukic-wrap .button:not(.button-primary):hover,
+.Lukic-wrap .button-secondary:hover,
+.Lukic-wrap .button:not(.button-primary):focus,
+.Lukic-wrap .button-secondary:focus {
+    border-color: var(--Lukic-primary, #00E1AF);
+    color: var(--Lukic-primary, #00E1AF);
+}
+
+.Lukic-settings-wrap .button:not(.button-primary) .dashicons,
+.Lukic-settings-wrap .button-secondary .dashicons,
+.Lukic-wrap .button:not(.button-primary) .dashicons,
+.Lukic-wrap .button-secondary .dashicons {
+    color: var(--Lukic-primary, #00E1AF);
+}

@@ -1,0 +1,302 @@
+/* ============================================================
+   Login Page Designer – Admin Styles
+   ============================================================ */
+
+/* ── Layout: 2-column (form + preview) ── */
+.lpd-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 1100px) {
+    .lpd-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Section padding (scoped to this page) ── */
+.lpd-layout .Lukic-settings-section {
+    padding: 20px;
+}
+
+/* ── Field rows: consistent spacing ── */
+.lpd-layout .Lukic-field-row {
+    margin-bottom: 16px;
+}
+
+.lpd-layout .Lukic-field-row:last-child {
+    margin-bottom: 0;
+}
+
+.lpd-layout .Lukic-field-row label {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: #1d2327;
+}
+
+/* ── 2-col grid ── */
+.lpd-layout .Lukic-grid-2-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 900px) {
+    .lpd-layout .Lukic-grid-2-col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Section headings ── */
+.lpd-layout .Lukic-settings-section h2 {
+    margin: 0 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1d2327;
+}
+
+.lpd-layout .Lukic-settings-section h3 {
+    margin: 18px 0 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #50575e;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ── Inputs ── */
+.lpd-layout input[type="text"].regular-text,
+.lpd-layout input[type="url"].regular-text {
+    width: 100%;
+    max-width: 100%;
+}
+
+.lpd-layout input[type="number"].small-text {
+    width: 80px;
+}
+
+/* ── Background-type radio toggle ── */
+.lpd-type-toggle,
+.lpd-shadow-toggle {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.lpd-type-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 16px;
+    border: 1px solid var(--Lukic-dark-surface, #444444);
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--Lukic-dark-surface, #444444);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    user-select: none;
+    line-height: 1.4;
+}
+
+.lpd-type-label input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.lpd-type-label:hover {
+    background: #f0f6fc;
+    border-color: var(--Lukic-primary, #00E1AF);
+    color: var(--Lukic-primary, #00E1AF);
+}
+
+.lpd-type-label.is-active {
+    background: var(--Lukic-primary, #00E1AF);
+    border-color: var(--Lukic-primary, #00E1AF);
+    color: #fff;
+    font-weight: 600;
+}
+
+/* ── Media / image fields ── */
+.lpd-media-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lpd-image-preview {
+    width: 100%;
+    max-width: 220px;
+    height: 80px;
+    background: #f6f7f7;
+    border: 1px dashed #c3c4c7;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.lpd-image-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.lpd-bg-preview {
+    max-width: 300px;
+    height: 100px;
+}
+
+.lpd-bg-preview img {
+    object-fit: cover;
+}
+
+.lpd-media-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* ── Sub-sections (shown/hidden by JS) ── */
+.lpd-bg-sub {
+    margin-top: 14px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-left: 3px solid #2271b1;
+    border-radius: 0 6px 6px 0;
+}
+
+/* ── Preview button next to Save ── */
+.lpd-preview-btn {
+    margin-left: 12px !important;
+    vertical-align: middle;
+}
+
+/* ── Submit container ── */
+.lpd-layout .Lukic-submit-container {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding-top: 8px;
+}
+
+/* ── Custom CSS textarea ── */
+#lpd_custom_css {
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    resize: vertical;
+    width: 100%;
+}
+
+/* ============================================================
+   Live Preview Panel
+   ============================================================ */
+.lpd-preview-wrap {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #c3c4c7;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.lpd-preview-bg {
+    background: #f0f0f1;
+    padding: 24px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 420px;
+    transition: background 0.3s;
+}
+
+.lpd-preview-card {
+    background: #fff;
+    padding: 24px 20px 16px;
+    border-radius: 4px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.13);
+    width: 200px;
+    transition: background 0.3s, border-radius 0.25s, box-shadow 0.25s;
+}
+
+.lpd-preview-logo {
+    text-align: center;
+    margin-bottom: 14px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lpd-preview-logo img {
+    max-width: 80px;
+    max-height: 54px;
+    object-fit: contain;
+    display: block;
+}
+
+.lpd-preview-logo-placeholder {
+    font-size: 11px;
+    color: #aaa;
+    font-style: italic;
+    background: #eee;
+    padding: 3px 10px;
+    border-radius: 3px;
+}
+
+.lpd-preview-field {
+    margin-bottom: 9px;
+}
+
+.lpd-preview-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    color: #3c4858;
+    margin-bottom: 3px;
+    transition: color 0.2s;
+}
+
+.lpd-preview-input {
+    height: 20px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.lpd-preview-btn-wrap {
+    margin-top: 12px;
+}
+
+.lpd-preview-submit {
+    background: #2271b1;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    padding: 6px 0;
+    border-radius: 3px;
+    cursor: default;
+    transition: background 0.2s, color 0.2s, border-radius 0.2s;
+}
+
+.lpd-preview-links {
+    margin-top: 9px;
+    text-align: center;
+}
+
+.lpd-preview-link {
+    font-size: 10px;
+    color: #2271b1;
+    text-decoration: none;
+    transition: color 0.2s;
+}
