@@ -217,37 +217,35 @@ add_action( 'admin_enqueue_scripts', 'Lukic_content_order_scripts' );
  * AJAX callback to update post order
  */
 function Lukic_update_post_order() {
-	// Check nonce for security
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'Lukic_content_order_nonce' ) ) {
-		wp_send_json_error( array( 'message' => __( 'Security check failed.', 'lukic-code-snippets' ) ) );
-	}
-
-	// Check permissions
-	if ( ! current_user_can( 'edit_posts' ) ) {
-		wp_send_json_error( array( 'message' => __( 'You do not have permission to do this.', 'lukic-code-snippets' ) ) );
-	}
+	check_ajax_referer( 'Lukic_content_order_nonce', 'nonce' );
 
 	// Get and validate data
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	$post_type = isset( $_POST['post_type'] ) ? sanitize_text_field( wp_unslash( $_POST['post_type'] ) ) : '';
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$post_ids  = isset( $_POST['post_ids'] ) ? wp_unslash( (array) $_POST['post_ids'] ) : array();
+	$post_ids  = isset( $_POST['post_ids'] ) ? array_values( array_filter( array_map( 'absint', wp_unslash( (array) $_POST['post_ids'] ) ) ) ) : array();
 
-	if ( empty( $post_type ) || empty( $post_ids ) || ! post_type_exists( $post_type ) ) {
+	if ( empty( $post_type ) || empty( $post_ids ) || ! post_type_exists( $post_type ) || ! in_array( $post_type, Lukic_get_orderable_post_types(), true ) ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid data received.', 'lukic-code-snippets' ) ) );
+	}
+
+	$post_type_obj = get_post_type_object( $post_type );
+	$capability    = ( $post_type_obj && isset( $post_type_obj->cap->edit_posts ) ) ? $post_type_obj->cap->edit_posts : 'edit_posts';
+
+	if ( ! current_user_can( $capability ) ) {
+		wp_send_json_error( array( 'message' => __( 'You do not have permission to do this.', 'lukic-code-snippets' ) ) );
+	}
+
+	foreach ( $post_ids as $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post || $post->post_type !== $post_type || ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid post list received.', 'lukic-code-snippets' ) ) );
+		}
 	}
 
 	// Update order
 	$success = true;
 	foreach ( $post_ids as $menu_order => $post_id ) {
-		$post_id = (int) $post_id;
-
-		// Verify post exists and is of the right type
-		$post = get_post( $post_id );
-		if ( ! $post || $post->post_type !== $post_type ) {
-			continue;
-		}
-
 		// Update menu order
 		$updated_post = array(
 			'ID'         => $post_id,
@@ -261,8 +259,12 @@ function Lukic_update_post_order() {
 	}
 
 	if ( $success ) {
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$http_referer = isset( $_SERVER['HTTP_REFERER'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
+		$http_referer = wp_get_referer();
+		if ( ! $http_referer ) {
+			$http_referer = $post_type === 'post'
+				? admin_url( 'edit.php?page=lukic-order-post' )
+				: admin_url( 'edit.php?post_type=' . $post_type . '&page=lukic-order-' . $post_type );
+		}
 		wp_send_json_success(
 			array(
 				'message'  => __( 'Order updated successfully.', 'lukic-code-snippets' ),

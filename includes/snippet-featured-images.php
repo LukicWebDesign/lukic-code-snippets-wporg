@@ -307,14 +307,21 @@ if ( ! function_exists( 'Lukic_show_featured_images_init' ) ) {
 	function Lukic_ajax_update_featured_image() {
 		check_ajax_referer( 'lukic_fi_admin_nonce', 'nonce' );
 
-		$post_id       = isset( $_POST['object_id'] ) ? intval( $_POST['object_id'] ) : 0;
-		$attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : -1;
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$post_id       = isset( $_POST['object_id'] ) ? absint( wp_unslash( $_POST['object_id'] ) ) : 0;
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$attachment_id = isset( $_POST['attachment_id'] ) ? absint( wp_unslash( $_POST['attachment_id'] ) ) : 0;
 
 		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'lukic-code-snippets' ) ) );
 		}
 
 		if ( $attachment_id > 0 ) {
+			$attachment = get_post( $attachment_id );
+			if ( ! $attachment || 'attachment' !== $attachment->post_type || ! wp_attachment_is_image( $attachment_id ) || ! current_user_can( 'edit_post', $attachment_id ) ) {
+				wp_send_json_error( array( 'message' => __( 'Invalid image selection.', 'lukic-code-snippets' ) ) );
+			}
+
 			set_post_thumbnail( $post_id, $attachment_id );
 			$image_url = wp_get_attachment_image_url( $attachment_id, array( 80, 80 ) );
 		} else {
@@ -331,8 +338,10 @@ if ( ! function_exists( 'Lukic_show_featured_images_init' ) ) {
 	function Lukic_ajax_update_taxonomy_image() {
 		check_ajax_referer( 'lukic_fi_admin_nonce', 'nonce' );
 
-		$term_id       = isset( $_POST['object_id'] ) ? intval( $_POST['object_id'] ) : 0;
-		$attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : -1;
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$term_id       = isset( $_POST['object_id'] ) ? absint( wp_unslash( $_POST['object_id'] ) ) : 0;
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$attachment_id = isset( $_POST['attachment_id'] ) ? absint( wp_unslash( $_POST['attachment_id'] ) ) : 0;
 
 		if ( ! $term_id ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid Term ID.', 'lukic-code-snippets' ) ) );
@@ -345,7 +354,7 @@ if ( ! function_exists( 'Lukic_show_featured_images_init' ) ) {
 		}
 		
 		$tax = get_taxonomy( $term->taxonomy );
-		if ( ! $tax || ! current_user_can( $tax->cap->edit_terms ) ) {
+		if ( ! $tax || ( ! current_user_can( 'edit_term', $term_id ) && ! current_user_can( $tax->cap->edit_terms ) ) ) {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'lukic-code-snippets' ) ) );
 		}
 
@@ -353,6 +362,11 @@ if ( ! function_exists( 'Lukic_show_featured_images_init' ) ) {
 		$image_field_names = array( 'thumbnail_id', 'image', 'term_image', 'featured_image', 'category_image', 'tax_image' );
 		
 		if ( $attachment_id > 0 ) {
+			$attachment = get_post( $attachment_id );
+			if ( ! $attachment || 'attachment' !== $attachment->post_type || ! wp_attachment_is_image( $attachment_id ) || ! current_user_can( 'edit_post', $attachment_id ) ) {
+				wp_send_json_error( array( 'message' => __( 'Invalid image selection.', 'lukic-code-snippets' ) ) );
+			}
+
 			$field_to_update = 'thumbnail_id';
 			foreach ( $image_field_names as $field ) {
 				// Search if any metadata key already exists

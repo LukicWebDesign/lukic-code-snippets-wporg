@@ -449,9 +449,9 @@ class Lukic_DB_Tables_Manager {
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$table    = isset( $_POST['table'] ) ? sanitize_text_field( wp_unslash( $_POST['table'] ) ) : '';
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$page     = isset( $_POST['page'] ) ? intval( wp_unslash( $_POST['page'] ) ) : 1;
+		$page     = isset( $_POST['page'] ) ? max( 1, intval( wp_unslash( $_POST['page'] ) ) ) : 1;
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$per_page = isset( $_POST['per_page'] ) ? intval( wp_unslash( $_POST['per_page'] ) ) : 20;
+		$per_page = isset( $_POST['per_page'] ) ? max( 1, min( 200, intval( wp_unslash( $_POST['per_page'] ) ) ) ) : 20;
 		global $wpdb;
 		$table = $this->validate_table_name( $table );
 		if ( ! $table ) {
@@ -773,9 +773,9 @@ class Lukic_DB_Tables_Manager {
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$search_term = isset( $_POST['search_term'] ) ? sanitize_text_field( wp_unslash( $_POST['search_term'] ) ) : '';
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$page        = isset( $_POST['page'] ) ? intval( wp_unslash( $_POST['page'] ) ) : 1;
+		$page        = isset( $_POST['page'] ) ? max( 1, intval( wp_unslash( $_POST['page'] ) ) ) : 1;
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$per_page    = isset( $_POST['per_page'] ) ? intval( wp_unslash( $_POST['per_page'] ) ) : 20;
+		$per_page    = isset( $_POST['per_page'] ) ? max( 1, min( 200, intval( wp_unslash( $_POST['per_page'] ) ) ) ) : 20;
 		global $wpdb;
 		$table = $this->validate_table_name( $table );
 		if ( ! $table ) {

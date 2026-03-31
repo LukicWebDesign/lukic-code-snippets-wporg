@@ -194,10 +194,7 @@ function Lukic_image_attributes_editor_page() {
  * AJAX callback to update image attributes
  */
 function Lukic_update_image_attribute() {
-	// Verify nonce
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'Lukic_image_editor_nonce' ) ) {
-		wp_send_json_error( array( 'message' => 'Security check failed' ) );
-	}
+	check_ajax_referer( 'Lukic_image_editor_nonce', 'nonce' );
 
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	$field = isset( $_POST['field'] ) ? sanitize_text_field( wp_unslash( $_POST['field'] ) ) : '';
@@ -208,6 +205,15 @@ function Lukic_update_image_attribute() {
 
 	if ( ! $id || ! $field ) {
 		wp_send_json_error( array( 'message' => 'Missing required parameters' ) );
+	}
+
+	if ( ! in_array( $field, array( 'title', 'alt', 'caption', 'file_name' ), true ) ) {
+		wp_send_json_error( array( 'message' => 'Invalid field type' ) );
+	}
+
+	$attachment = get_post( $id );
+	if ( ! $attachment || 'attachment' !== $attachment->post_type || ! current_user_can( 'edit_post', $id ) ) {
+		wp_send_json_error( array( 'message' => 'Permission denied' ) );
 	}
 
 	// Update the corresponding database record
@@ -261,9 +267,10 @@ add_action( 'wp_ajax_Lukic_update_image_attribute', 'Lukic_update_image_attribut
  * AJAX callback to generate CSV file
  */
 function Lukic_generate_csv_file() {
-	// Verify nonce
-	if ( ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['nonce'] ) ), 'Lukic_image_editor_nonce' ) ) {
-		wp_die( 'Security check failed' );
+	check_ajax_referer( 'Lukic_image_editor_nonce', 'nonce' );
+
+	if ( ! current_user_can( 'upload_files' ) ) {
+		wp_die( 'Permission denied' );
 	}
 
 	$args   = array(
@@ -307,16 +314,18 @@ add_action( 'wp_ajax_Lukic_generate_csv_file', 'Lukic_generate_csv_file' );
  * AJAX callback to delete image
  */
 function Lukic_delete_image() {
-	// Verify nonce
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'Lukic_image_editor_nonce' ) ) {
-		wp_send_json_error( array( 'message' => 'Security check failed' ) );
-	}
+	check_ajax_referer( 'Lukic_image_editor_nonce', 'nonce' );
 
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	$id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
 
 	if ( ! $id ) {
 		wp_send_json_error( array( 'message' => 'Missing image ID' ) );
+	}
+
+	$attachment = get_post( $id );
+	if ( ! $attachment || 'attachment' !== $attachment->post_type || ! current_user_can( 'delete_post', $id ) ) {
+		wp_send_json_error( array( 'message' => 'Permission denied' ) );
 	}
 
 	// Delete the attachment
@@ -334,14 +343,11 @@ add_action( 'wp_ajax_Lukic_delete_image', 'Lukic_delete_image' );
  * AJAX callback to bulk update image attributes
  */
 function Lukic_bulk_update_images() {
-	// Verify nonce
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'Lukic_image_editor_nonce' ) ) {
-		wp_send_json_error( array( 'message' => 'Security check failed' ) );
-	}
+	check_ajax_referer( 'Lukic_image_editor_nonce', 'nonce' );
 
 	// Get parameters
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$image_ids = isset( $_POST['image_ids'] ) ? array_map( 'absint', wp_unslash( (array) $_POST['image_ids'] ) ) : array();
+	$image_ids = isset( $_POST['image_ids'] ) ? array_values( array_filter( array_map( 'absint', wp_unslash( (array) $_POST['image_ids'] ) ) ) ) : array();
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	$title     = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
@@ -358,6 +364,16 @@ function Lukic_bulk_update_images() {
 
 	// Process each image
 	foreach ( $image_ids as $id ) {
+		$attachment = get_post( $id );
+		if ( ! $attachment || 'attachment' !== $attachment->post_type || ! current_user_can( 'edit_post', $id ) ) {
+			$errors[] = array(
+				'id'      => $id,
+				'field'   => 'permission',
+				'message' => __( 'Permission denied for this image.', 'lukic-code-snippets' ),
+			);
+			continue;
+		}
+
 		// Update title if provided
 		if ( ! empty( $title ) ) {
 			$post_data = array(

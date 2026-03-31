@@ -44,9 +44,17 @@ if ( ! function_exists( 'Lukic_duplicate_post_init' ) ) {
 	 * Create a duplicate of a post or page
 	 */
 	function Lukic_duplicate_post_as_draft() {
-		// Check if user has permissions
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( esc_html__( 'You do not have permission to duplicate this content.', 'lukic-code-snippets' ) );
+		$post_id = 0;
+		if ( isset( $_GET['post'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$post_id = absint( wp_unslash( $_GET['post'] ) );
+		} elseif ( isset( $_POST['post'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$post_id = absint( wp_unslash( $_POST['post'] ) );
+		}
+
+		if ( ! $post_id ) {
+			wp_die( esc_html__( 'No post to duplicate has been provided.', 'lukic-code-snippets' ) );
 		}
 
 		// Verify nonce
@@ -54,23 +62,22 @@ if ( ! function_exists( 'Lukic_duplicate_post_init' ) ) {
 			wp_die( esc_html__( 'Security check failed. Please try again.', 'lukic-code-snippets' ) );
 		}
 
-		// Check for post ID
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		if ( ! ( isset( $_GET['post'] ) || isset( $_POST['post'] ) ||
-			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			( isset( $_REQUEST['action'] ) && 'Lukic_duplicate_post_as_draft' == wp_unslash( $_REQUEST['action'] ) ) ) ) {
-			wp_die( esc_html__( 'No post to duplicate has been provided.', 'lukic-code-snippets' ) );
-		}
-
-		// Get the original post ID
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$post_id = isset( $_GET['post'] ) ? absint( wp_unslash( $_GET['post'] ) ) : absint( wp_unslash( $_POST['post'] ) );
-
 		// Get the original post data
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
 			wp_die( esc_html__( 'Post creation failed, could not find original post.', 'lukic-code-snippets' ) );
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_die( esc_html__( 'You do not have permission to duplicate this content.', 'lukic-code-snippets' ) );
+		}
+
+		$post_type_object = get_post_type_object( $post->post_type );
+		$create_posts_cap = ( $post_type_object && isset( $post_type_object->cap->create_posts ) ) ? $post_type_object->cap->create_posts : 'edit_posts';
+
+		if ( ! current_user_can( $create_posts_cap ) ) {
+			wp_die( esc_html__( 'You do not have permission to create a duplicate of this content.', 'lukic-code-snippets' ) );
 		}
 
 		// Get current user as author
@@ -159,7 +166,10 @@ if ( ! function_exists( 'Lukic_duplicate_post_init' ) ) {
 	 * Add the duplicate link to post/page action rows
 	 */
 	function Lukic_add_duplicate_link( $actions, $post ) {
-		if ( current_user_can( 'edit_posts' ) ) {
+		$post_type_object = get_post_type_object( $post->post_type );
+		$create_posts_cap = ( $post_type_object && isset( $post_type_object->cap->create_posts ) ) ? $post_type_object->cap->create_posts : 'edit_posts';
+
+		if ( current_user_can( 'edit_post', $post->ID ) && current_user_can( $create_posts_cap ) ) {
 			$actions['duplicate'] = sprintf(
 				'<a href="%s" title="%s" rel="permalink">%s</a>',
 				wp_nonce_url(

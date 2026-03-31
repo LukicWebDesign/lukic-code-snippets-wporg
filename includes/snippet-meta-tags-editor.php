@@ -338,10 +338,7 @@ function Lukic_meta_tags_editor_page() {
  * AJAX callback to update meta tags
  */
 function Lukic_update_meta_tag() {
-	// Check nonce for security
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'Lukic_meta_tags_editor_nonce' ) ) {
-		wp_send_json_error( array( 'message' => __( 'Security check failed', 'lukic-code-snippets' ) ) );
-	}
+	check_ajax_referer( 'Lukic_meta_tags_editor_nonce', 'nonce' );
 
 	// Check if required data is set
 	if ( ! isset( $_POST['id'] ) || ! isset( $_POST['field'] ) || ! isset( $_POST['value'] ) ) {
@@ -357,82 +354,19 @@ function Lukic_update_meta_tag() {
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	$type  = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : 'post';
 
-	$success = false;
-	$message = '';
-
-	// Handle taxonomy IDs
-	if ( $type === 'taxonomy' && strpos( $id, 'tax_' ) === 0 ) {
-		$term_id = intval( str_replace( 'tax_', '', $id ) );
-
-		if ( Lukic_is_yoast_active() ) {
-			if ( $field === 'title' ) {
-				// Get the taxonomy name for this term
-				$term = get_term( $term_id );
-				if ( ! is_wp_error( $term ) && $term ) {
-					$taxonomy = $term->taxonomy;
-
-					// Update Yoast SEO title for this taxonomy term
-					return update_term_meta( $term_id, '_yoast_wpseo_title', $value );
-				}
-				return false;
-			} elseif ( $field === 'description' ) {
-				// Get the taxonomy name for this term
-				$term = get_term( $term_id );
-				if ( ! is_wp_error( $term ) && $term ) {
-					$taxonomy = $term->taxonomy;
-
-					// Update Yoast SEO description for this taxonomy term
-					return update_term_meta( $term_id, '_yoast_wpseo_metadesc', $value );
-				}
-				return false;
-			}
-		} elseif ( Lukic_is_rank_math_active() ) {
-			if ( $field === 'title' ) {
-				return update_term_meta( $term_id, 'rank_math_title', $value );
-			} elseif ( $field === 'description' ) {
-				return update_term_meta( $term_id, 'rank_math_description', $value );
-			}
-		} else {
-			// Store in custom meta if no SEO plugin is active
-			if ( $field === 'title' ) {
-				return update_term_meta( $term_id, '_meta_title', $value );
-			} elseif ( $field === 'description' ) {
-				return update_term_meta( $term_id, '_meta_description', $value );
-			}
-		}
-	} else {
-		// Handle posts, pages, CPTs
-		$post_id = intval( $id );
-
-		if ( Lukic_is_yoast_active() ) {
-			if ( $field === 'title' ) {
-				return update_post_meta( $post_id, '_yoast_wpseo_title', $value );
-			} elseif ( $field === 'description' ) {
-				return update_post_meta( $post_id, '_yoast_wpseo_metadesc', $value );
-			}
-		} elseif ( Lukic_is_rank_math_active() ) {
-			if ( $field === 'title' ) {
-				return update_post_meta( $post_id, 'rank_math_title', $value );
-			} elseif ( $field === 'description' ) {
-				return update_post_meta( $post_id, 'rank_math_description', $value );
-			}
-		} else {
-			// Store in custom meta if no SEO plugin is active
-			if ( $field === 'title' ) {
-				return update_post_meta( $post_id, '_meta_title', $value );
-			} elseif ( $field === 'description' ) {
-				return update_post_meta( $post_id, '_meta_description', $value );
-			}
-		}
+	if ( ! in_array( $field, array( 'title', 'description' ), true ) || ! in_array( $type, array( 'post', 'taxonomy' ), true ) ) {
+		wp_send_json_error( array( 'message' => __( 'Invalid request data', 'lukic-code-snippets' ) ) );
 	}
 
-	if ( $success ) {
-		$message = __( 'Meta tag updated successfully', 'lukic-code-snippets' );
-		wp_send_json_success( array( 'message' => $message ) );
-	} else {
-		$message = __( 'Failed to update meta tag', 'lukic-code-snippets' );
-		wp_send_json_error( array( 'message' => $message ) );
+	if ( ! Lukic_can_edit_meta_target( $id, $type ) ) {
+		wp_send_json_error( array( 'message' => __( 'You do not have permission to edit this item.', 'lukic-code-snippets' ) ) );
 	}
+
+	if ( Lukic_update_meta_value( $id, $type, $field, $value ) ) {
+		wp_send_json_success( array( 'message' => __( 'Meta tag updated successfully', 'lukic-code-snippets' ) ) );
+	}
+
+	wp_send_json_error( array( 'message' => __( 'Failed to update meta tag', 'lukic-code-snippets' ) ) );
 }
 add_action( 'wp_ajax_Lukic_update_meta_tag', 'Lukic_update_meta_tag' );
 
@@ -440,9 +374,10 @@ add_action( 'wp_ajax_Lukic_update_meta_tag', 'Lukic_update_meta_tag' );
  * AJAX callback to export meta tags as CSV
  */
 function Lukic_export_meta_tags_csv() {
-	// Check nonce for security
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'Lukic_meta_tags_editor_nonce' ) ) {
-		wp_send_json_error( array( 'message' => __( 'Security check failed', 'lukic-code-snippets' ) ) );
+	check_ajax_referer( 'Lukic_meta_tags_editor_nonce', 'nonce' );
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( array( 'message' => __( 'You do not have permission to export meta tags.', 'lukic-code-snippets' ) ) );
 	}
 
 	// Get all URLs
@@ -488,9 +423,10 @@ add_action( 'wp_ajax_Lukic_export_meta_tags_csv', 'Lukic_export_meta_tags_csv' )
  * AJAX callback to import meta tags from CSV
  */
 function Lukic_import_meta_tags_csv() {
-	// Check nonce for security
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'Lukic_meta_tags_editor_nonce' ) ) {
-		wp_send_json_error( array( 'message' => __( 'Security check failed', 'lukic-code-snippets' ) ) );
+	check_ajax_referer( 'Lukic_meta_tags_editor_nonce', 'nonce' );
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( array( 'message' => __( 'You do not have permission to import meta tags.', 'lukic-code-snippets' ) ) );
 	}
 
 	// Check if file was uploaded
@@ -499,9 +435,24 @@ function Lukic_import_meta_tags_csv() {
 		wp_send_json_error( array( 'message' => __( 'No file uploaded or upload error', 'lukic-code-snippets' ) ) );
 	}
 
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	$file = $_FILES['file'];
+	if ( empty( $file['tmp_name'] ) || ! is_uploaded_file( $file['tmp_name'] ) ) {
+		wp_send_json_error( array( 'message' => __( 'Invalid upload source', 'lukic-code-snippets' ) ) );
+	}
+
+	$file_check         = wp_check_filetype_and_ext( $file['tmp_name'], $file['name'] );
+	$file_ext           = ! empty( $file_check['ext'] ) ? strtolower( $file_check['ext'] ) : '';
+	$file_type          = ! empty( $file_check['type'] ) ? strtolower( $file_check['type'] ) : '';
+	$allowed_mime_types = array( 'text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel' );
+
+	if ( 'csv' !== $file_ext || ( $file_type && ! in_array( $file_type, $allowed_mime_types, true ) ) ) {
+		wp_send_json_error( array( 'message' => __( 'Only CSV uploads are allowed.', 'lukic-code-snippets' ) ) );
+	}
+
 	// Get file content
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$file_content = file_get_contents( $_FILES['file']['tmp_name'] );
+	$file_content = file_get_contents( $file['tmp_name'] );
 	if ( ! $file_content ) {
 		wp_send_json_error( array( 'message' => __( 'Could not read file content', 'lukic-code-snippets' ) ) );
 	}
@@ -546,6 +497,12 @@ function Lukic_import_meta_tags_csv() {
 		$type        = sanitize_text_field( $row[ $type_index ] );
 		$title       = isset( $row[ $title_index ] ) ? sanitize_text_field( $row[ $title_index ] ) : '';
 		$description = isset( $row[ $desc_index ] ) ? sanitize_textarea_field( $row[ $desc_index ] ) : '';
+
+		if ( ! Lukic_can_edit_meta_target( $id, $type ) ) {
+			/* translators: %s: Post or term ID */
+			$errors[] = sprintf( __( 'Permission denied for ID: %s', 'lukic-code-snippets' ), $id );
+			continue;
+		}
 
 		// Update meta title
 		if ( ! empty( $title ) ) {
@@ -594,6 +551,37 @@ function Lukic_import_meta_tags_csv() {
 	}
 }
 add_action( 'wp_ajax_Lukic_import_meta_tags_csv', 'Lukic_import_meta_tags_csv' );
+
+/**
+ * Check whether the current user can edit the requested meta target.
+ *
+ * @param string $id   Post or taxonomy identifier.
+ * @param string $type Target type.
+ * @return bool
+ */
+function Lukic_can_edit_meta_target( $id, $type ) {
+	if ( $type === 'taxonomy' && strpos( $id, 'tax_' ) === 0 ) {
+		$term_id = absint( str_replace( 'tax_', '', $id ) );
+		$term    = get_term( $term_id );
+		if ( ! $term || is_wp_error( $term ) ) {
+			return false;
+		}
+
+		$taxonomy = get_taxonomy( $term->taxonomy );
+		if ( ! $taxonomy ) {
+			return false;
+		}
+
+		return current_user_can( 'edit_term', $term_id ) || current_user_can( $taxonomy->cap->edit_terms );
+	}
+
+	$post_id = absint( $id );
+	if ( ! $post_id || ! get_post( $post_id ) ) {
+		return false;
+	}
+
+	return current_user_can( 'edit_post', $post_id );
+}
 
 /**
  * Helper function to update meta value

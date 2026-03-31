@@ -221,6 +221,10 @@ if ( ! function_exists( 'Lukic_admin_notifications_manager' ) ) {
 			wp_send_json_error( 'Invalid nonce' );
 		}
 
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'Permission denied' );
+		}
+
 		// Process dismiss action
 		// In a real implementation, we'd store the dismissed notice ID
 		// For this simple version, we just return success

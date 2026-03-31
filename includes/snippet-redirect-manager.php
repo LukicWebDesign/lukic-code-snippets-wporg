@@ -553,6 +553,12 @@ if ( ! function_exists( 'Lukic_redirect_manager_init' ) ) {
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$status        = isset( $_POST['status'] ) ? intval( wp_unslash( $_POST['status'] ) ) : 1;
 
+		if ( ! in_array( $redirect_type, array( 301, 302, 307, 308 ), true ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid redirect type', 'lukic-code-snippets' ) ) );
+		}
+
+		$status = $status === 0 ? 0 : 1;
+
 		// Validate URLs
 		if ( empty( $source_url ) || empty( $target_url ) ) {
 			wp_send_json_error( array( 'message' => __( 'Source and target URLs are required', 'lukic-code-snippets' ) ) );
@@ -698,8 +704,13 @@ if ( ! function_exists( 'Lukic_redirect_manager_init' ) ) {
 		}
 
 		// Save settings
-		$track_hits      = isset( $_POST['track_hits'] ) ? intval( $_POST['track_hits'] ) : 0;
-		$log_last_access = isset( $_POST['log_last_access'] ) ? intval( $_POST['log_last_access'] ) : 0;
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$track_hits      = isset( $_POST['track_hits'] ) ? absint( wp_unslash( $_POST['track_hits'] ) ) : 0;
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$log_last_access = isset( $_POST['log_last_access'] ) ? absint( wp_unslash( $_POST['log_last_access'] ) ) : 0;
+
+		$track_hits      = $track_hits ? 1 : 0;
+		$log_last_access = $log_last_access ? 1 : 0;
 
 		update_option( 'Lukic_redirect_track_hits', $track_hits );
 		update_option( 'Lukic_redirect_log_last_access', $log_last_access );
