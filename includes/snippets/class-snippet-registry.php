@@ -261,17 +261,6 @@ class Lukic_Snippet_Registry {
 			'description'      => 'Displays the current template file name in the admin bar, helping developers identify which template file is being used on each page. Includes detailed information on hover.',
 			'long_description' => 'A developer tool that displays the name of the current theme template file (e.g., `page.php`, `single.php`) in the admin bar on the frontend. Hovering over it reveals the full path and hierarchy. Essential for theme development and debugging.',
 		),
-		'custom_login_url'        => array(
-			'file'             => 'snippet-custom-login-url.php',
-			'name'             => 'Custom Login URL',
-			'category'         => 'security',
-			'tags'             => array( 'login', 'security' ),
-			'description'      => 'Allows you to set a custom login URL for your WordPress site.',
-			'long_description' => 'Changes the default WordPress login URL (`/wp-login.php`) to a custom slug of your choice (e.g., `/my-login`). This hides your login page from bots and automated scripts that target the default URL, reducing brute-force attacks.',
-			'cleanup'          => array(
-				'options' => array( 'Lukic_custom_login_url' ),
-			),
-		),
 		'login_page_designer'     => array(
 			'file'             => 'snippet-login-page-designer.php',
 			'name'             => 'Login Page Designer',

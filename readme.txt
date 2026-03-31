@@ -55,7 +55,6 @@ A modular performance toolkit: 40+ code snippets you toggle on and off — zero 
 * Fluid Typography Calculator
 
 **Security**
-* Custom Login URL
 * Hide Author Slugs
 * Security Headers Manager (CSP, HSTS, X-Frame-Options, etc.)
 
@@ -127,7 +126,6 @@ Yes. All UI strings use the `lukic-code-snippets` text domain with proper `__()`
 
 = 2.8.1 =
 * Fix: Redirect Manager settings now save properly when toggled off.
-* Fix: Prevent WordPress canonical redirects from exposing the hidden Custom Login URL.
 * Fix: Maintenance Mode IP exclusions now correctly handle local loopback URLs (::1 and 127.0.0.1) and varied string formats.
 * Fix: Add missing transients to the clean uninstallation routine.
 * Docs: Clarify Redirect Manager trailing slash URL usage rules.

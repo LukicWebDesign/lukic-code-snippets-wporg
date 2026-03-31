@@ -128,7 +128,6 @@
                 'hide_admin_notices',           // Hide Admin Notices (affects admin interface)
                 'custom_admin_footer',          // Custom Admin Footer Text (affects admin footer)
                 'hide_footer_thankyou',         // Hide Footer Thank You (affects admin footer)
-                'custom_login_url',             // Custom Login URL (affects login system)
                 'maintenance_mode',             // Maintenance Mode (affects site behavior)
                 'security_headers',             // Security Headers Manager (affects headers)
                 'word_counter',                 // Word Counter (adds meta box to post editor)
