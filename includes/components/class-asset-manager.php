@@ -162,12 +162,6 @@ class Lukic_Asset_Manager {
 				'in_footer'   => true,
 				'description' => 'Redirect Manager',
 			),
-			'Lukic-upload-limits'    => array(
-				'src'         => 'assets/js/upload-limits.js',
-				'deps'        => array( 'jquery' ),
-				'in_footer'   => true,
-				'description' => 'Upload Limits Manager',
-			),
 			'Lukic-datatables'       => array(
 				'src'         => 'assets/js/jquery.dataTables.min.js',
 				'deps'        => array( 'jquery' ),
@@ -278,9 +272,6 @@ class Lukic_Asset_Manager {
 			'lukic-redirect-manager'        => array(
 				'styles'  => array(),
 				'scripts' => array( 'Lukic-redirect-manager' ),
-			),
-			'lukic-upload-limits'           => array(
-				'scripts' => array( 'Lukic-upload-limits' ),
 			),
 		);
 

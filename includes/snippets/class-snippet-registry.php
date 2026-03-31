@@ -291,14 +291,6 @@ class Lukic_Snippet_Registry {
 			'description'      => 'Add a word counter tool to analyze text for words, characters, sentences, and paragraphs.',
 			'long_description' => 'Adds a comprehensive content analysis tool to the post editor. It counts words, characters, sentences, and paragraphs, and provides reading time estimates. Useful for writers and SEOs who need to hit specific content length targets.',
 		),
-		'disable_all_updates'     => array(
-			'file'             => 'snippet-disable-all-updates.php',
-			'name'             => 'Disable All Updates',
-			'category'         => 'security',
-			'tags'             => array( 'updates', 'disable' ),
-			'description'      => 'Disable all WordPress updates, including core, plugins, and themes.',
-			'long_description' => 'Completely disables all automatic and manual updates for WordPress core, plugins, and themes. It also hides the update notifications. **Use with caution**: This is intended for frozen environments or sites where updates must be strictly controlled and tested before application.',
-		),
 		'image_attributes_editor' => array(
 			'file'             => 'snippet-image-attributes-editor.php',
 			'name'             => 'Image Attributes Editor',
@@ -365,17 +357,6 @@ class Lukic_Snippet_Registry {
 				'options' => array( 'Lukic_security_headers' ),
 			),
 		),
-		'upload_limits'           => array(
-			'file'             => 'snippet-upload-limits.php',
-			'name'             => 'Control Upload Limits',
-			'category'         => 'utility',
-			'tags'             => array( 'uploads', 'php', 'performance' ),
-			'description'      => 'Easily adjust PHP upload limits including maximum file size, execution time, and memory limit to improve handling of large files and resource-intensive operations.',
-			'long_description' => 'Provides a UI to override PHP configuration settings for `upload_max_filesize`, `post_max_size`, `max_execution_time`, and `memory_limit`. This is useful if you need to upload large files and cannot edit the `php.ini` file directly.',
-			'cleanup'          => array(
-				'options' => array( 'Lukic_upload_limits' ),
-			),
-		),
 		'hide_author_slugs'       => array(
 			'file'             => 'snippet-hide-author-slugs.php',
 			'name'             => 'Hide Author Slugs',
@@ -394,14 +375,6 @@ class Lukic_Snippet_Registry {
 			'cleanup'          => array(
 				'options' => array( 'lukic_admin_menu_settings' ),
 			),
-		),
-		'disable_file_editing'    => array(
-			'file'             => 'snippet-disable-file-editing.php',
-			'name'             => 'Disable File Editing',
-			'category'         => 'security',
-			'tags'             => array( 'security', 'editor', 'disable' ),
-			'description'      => 'Disable the theme and plugin file editor in WordPress admin to prevent unauthorized code changes and reduce security risks from compromised accounts.',
-			'long_description' => 'Disables the built-in Theme Editor and Plugin Editor in the WordPress dashboard. This prevents anyone (including admins) from editing PHP files directly from the admin area, which is a critical security best practice to prevent code injection if an account is compromised.',
 		),
 		'user_profile_image'      => array(
 			'file'             => 'snippet-user-profile-image.php',

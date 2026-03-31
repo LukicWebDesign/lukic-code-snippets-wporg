@@ -56,15 +56,12 @@ A modular performance toolkit: 40+ code snippets you toggle on and off — zero 
 
 **Security**
 * Custom Login URL
-* Disable All Updates
-* Disable File Editing
 * Hide Author Slugs
 * Security Headers Manager (CSP, HSTS, X-Frame-Options, etc.)
 
 **Utility & Development**
 * Maintenance Mode (customizable page with live preview)
 * Limit Revisions (per post type)
-* Control Upload Limits (PHP overrides)
 * Custom Database Tables Manager (view, search, edit, export CSV)
 * Image Attributes Editor (bulk edit alt text, title, caption)
 * Last Login User (column in Users table)
@@ -154,7 +151,6 @@ Yes. All UI strings use the `lukic-code-snippets` text domain with proper `__()`
 * New: Show Active Plugins First snippet.
 * New: User Profile Image snippet.
 * New: Admin Menu Organizer and Hide Author Slugs snippets.
-* New: Disable File Editing snippet.
 
 = 2.3.0 =
 * New: Centralized snippet registry; Maintenance Mode on/off switch.
