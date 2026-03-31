@@ -50,7 +50,7 @@ class Lukic_DB_Tables_Manager {
 
 		// Check if we are on the correct page
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! isset( $_GET['page'] ) || 'lukic-db-tables-manager' !== sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) {
+		if ( ! isset( $_GET['page'] ) || 'lukic-db-tables-manager' !== sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
 			return;
 		}
 
@@ -335,10 +335,10 @@ class Lukic_DB_Tables_Manager {
 
 		foreach ( $tables as $table ) {
 			$table_info = array(
-				'name'   => $table['Name'],
-				'engine' => $table['Engine'],
-				'rows'   => $table['Rows'],
-				'size'   => $this->format_size( $table['Data_length'] + $table['Index_length'] ),
+				'name'   => isset( $table['Name'] ) ? sanitize_text_field( $table['Name'] ) : '',
+				'engine' => isset( $table['Engine'] ) ? sanitize_text_field( $table['Engine'] ) : '',
+				'rows'   => isset( $table['Rows'] ) ? (int) $table['Rows'] : 0,
+				'size'   => $this->format_size( ( isset( $table['Data_length'] ) ? (float) $table['Data_length'] : 0 ) + ( isset( $table['Index_length'] ) ? (float) $table['Index_length'] : 0 ) ),
 			);
 
 			$all_tables[] = $table_info;
@@ -363,7 +363,7 @@ class Lukic_DB_Tables_Manager {
 	private function format_size( $bytes ) {
 		$units = array( 'B', 'KB', 'MB', 'GB', 'TB' );
 
-		$bytes = max( $bytes, 0 );
+		$bytes = max( (float) $bytes, 0 );
 		$pow   = floor( ( $bytes ? log( $bytes ) : 0 ) / log( 1024 ) );
 		$pow   = min( $pow, count( $units ) - 1 );
 
@@ -419,7 +419,7 @@ class Lukic_DB_Tables_Manager {
 					<td><?php echo esc_html( $column->Type ); ?></td>
 					<td><?php echo esc_html( $column->Null ); ?></td>
 					<td><?php echo esc_html( $column->Key ); ?></td>
-					<td><?php echo is_null( $column->Default ) ? '<em>NULL</em>' : esc_html( $column->Default ); ?></td>
+					<td><?php echo is_null( $column->Default ) ? wp_kses_post( '<em>NULL</em>' ) : esc_html( $column->Default ); ?></td>
 					<td><?php echo esc_html( $column->Extra ); ?></td>
 				</tr>
 				<?php endforeach; ?>
@@ -493,7 +493,7 @@ class Lukic_DB_Tables_Manager {
 		}
 
 		// Calculate total pages
-		$total_pages = ceil( $total_rows / $per_page );
+		$total_pages = (int) ceil( $total_rows / $per_page );
 
 		// Get table structure to identify primary key — $table is validated.
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
@@ -524,7 +524,7 @@ class Lukic_DB_Tables_Manager {
 					<td>
 						<?php
 						if ( is_null( $value ) ) {
-							echo '<em>NULL</em>';
+							echo wp_kses_post( '<em>NULL</em>' );
 						} else {
 							$string_value = is_scalar( $value ) ? (string) $value : maybe_serialize( $value );
 							if ( ! mb_check_encoding( $string_value, 'UTF-8' ) ) {
@@ -602,7 +602,8 @@ class Lukic_DB_Tables_Manager {
 		foreach ( $rows as $row ) {
 			$csv_row = array();
 			foreach ( $row as $value ) {
-				$csv_row[] = '"' . str_replace( '"', '""', $value ) . '"';
+				$value     = is_null( $value ) ? '' : ( is_scalar( $value ) ? (string) $value : maybe_serialize( $value ) );
+				$csv_row[] = '"' . str_replace( '"', '""', wp_check_invalid_utf8( $value ) ) . '"';
 			}
 			$csv[] = implode( ',', $csv_row );
 		}
@@ -719,6 +720,10 @@ class Lukic_DB_Tables_Manager {
 		foreach ( $row_data as $column => $value ) {
 			$column = $this->validate_column_name( $column );
 			if ( ! $column || ! in_array( $column, $column_names, true ) ) {
+				continue;
+			}
+
+			if ( ! is_scalar( $value ) && null !== $value ) {
 				continue;
 			}
 
@@ -877,7 +882,7 @@ class Lukic_DB_Tables_Manager {
 		}
 
 		// Calculate total pages
-		$total_pages = ceil( $total_rows / $per_page );
+		$total_pages = (int) ceil( $total_rows / $per_page );
 
 		ob_start();
 		?>
@@ -897,7 +902,7 @@ class Lukic_DB_Tables_Manager {
 					<td>
 						<?php
 						if ( is_null( $value ) ) {
-							$display_value = '<em>NULL</em>';
+							$display_value = wp_kses_post( '<em>NULL</em>' );
 						} else {
 							$string_value = is_scalar( $value ) ? (string) $value : maybe_serialize( $value );
 							if ( ! mb_check_encoding( $string_value, 'UTF-8' ) ) {

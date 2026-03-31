@@ -74,6 +74,7 @@ if ( ! function_exists( 'Lukic_admin_notifications_manager' ) ) {
 			.Lukic-notice-group h4 { margin: 0 0 5px 0; padding-bottom: 5px; border-bottom: 1px solid #f1f1f1; }
 			.Lukic-notice-dismiss { float: right; color: #aaa; cursor: pointer; margin-left: 5px; }
 			.Lukic-notice-dismiss:hover { color: #dc3232; }
+			.notice-debug-info { color: #888; font-size: 10px; margin-top: 5px; opacity: 0.7; }
 		' );
 	}
 
@@ -107,7 +108,7 @@ if ( ! function_exists( 'Lukic_admin_notifications_manager' ) ) {
 		echo '<div class="Lukic-notifications-header">';
 		echo '<h3>' . esc_html__( 'Notifications', 'lukic-code-snippets' ) . '</h3>';
 		echo '<span class="Lukic-notifications-count">' . esc_html( Lukic_count_notifications( $notices ) ) . '</span>';
-		echo '<span class="Lukic-dismiss-all">Dismiss All</span>';
+		echo '<span class="Lukic-dismiss-all">' . esc_html__( 'Dismiss All', 'lukic-code-snippets' ) . '</span>';
 		echo '</div>';
 		echo '<div class="Lukic-notifications-content">';
 
@@ -135,14 +136,111 @@ if ( ! function_exists( 'Lukic_admin_notifications_manager' ) ) {
 	 * Add dismiss buttons to each notice
 	 */
 	function Lukic_add_dismiss_buttons( $notices ) {
-		// Replace closing div tags with a dismiss button
-		$notices = preg_replace(
-			'/<\/div>\s*$/',
-			'<span class="Lukic-notice-dismiss dashicons dashicons-dismiss" title="Dismiss"></span></div>',
+		return preg_replace_callback(
+			'/<div\s[^>]*class="[^"]*notice[^"]*"[^>]*>.*?<\/div>/s',
+			function ( $matches ) {
+				return preg_replace(
+					'/<\/div>\s*$/',
+					'<span class="Lukic-notice-dismiss dashicons dashicons-dismiss" title="' . esc_attr__( 'Dismiss', 'lukic-code-snippets' ) . '"></span></div>',
+					$matches[0]
+				);
+			},
 			$notices
 		);
+	}
 
-		return $notices;
+	/**
+	 * Allowlist for buffered admin notice HTML.
+	 *
+	 * @return array
+	 */
+	function Lukic_admin_notifications_allowed_html() {
+		return array(
+			'a'      => array(
+				'class'  => true,
+				'href'   => true,
+				'id'     => true,
+				'rel'    => true,
+				'target' => true,
+				'title'  => true,
+			),
+			'b'      => array(),
+			'br'     => array(),
+			'button' => array(
+				'class'    => true,
+				'disabled' => true,
+				'id'       => true,
+				'name'     => true,
+				'type'     => true,
+				'value'    => true,
+			),
+			'code'   => array(),
+			'div'    => array(
+				'aria-hidden'      => true,
+				'class'            => true,
+				'data-dismissible' => true,
+				'data-slug'        => true,
+				'id'               => true,
+				'role'             => true,
+			),
+			'em'     => array(),
+			'form'   => array(
+				'action' => true,
+				'class'  => true,
+				'id'     => true,
+				'method' => true,
+			),
+			'h1'     => array( 'class' => true ),
+			'h2'     => array( 'class' => true ),
+			'h3'     => array( 'class' => true ),
+			'h4'     => array( 'class' => true ),
+			'img'    => array(
+				'alt'    => true,
+				'class'  => true,
+				'height' => true,
+				'src'    => true,
+				'width'  => true,
+			),
+			'input'  => array(
+				'checked'  => true,
+				'class'    => true,
+				'disabled' => true,
+				'id'       => true,
+				'name'     => true,
+				'type'     => true,
+				'value'    => true,
+			),
+			'label'  => array(
+				'class' => true,
+				'for'   => true,
+			),
+			'li'     => array( 'class' => true ),
+			'ol'     => array( 'class' => true ),
+			'p'      => array( 'class' => true ),
+			'pre'    => array( 'class' => true ),
+			'span'   => array(
+				'aria-hidden' => true,
+				'class'       => true,
+				'id'          => true,
+				'role'        => true,
+				'title'       => true,
+			),
+			'strong' => array(),
+			'table'  => array( 'class' => true ),
+			'tbody'  => array(),
+			'td'     => array(
+				'class' => true,
+				'colspan' => true,
+			),
+			'th'     => array(
+				'class'   => true,
+				'colspan' => true,
+				'scope'   => true,
+			),
+			'thead'  => array(),
+			'tr'     => array( 'class' => true ),
+			'ul'     => array( 'class' => true ),
+		);
 	}
 
 	/**
@@ -169,13 +267,23 @@ if ( ! function_exists( 'Lukic_admin_notifications_manager' ) ) {
 
 		foreach ( $matches[0] as $notice ) {
 			// Add debug class to show notice source
-			$debug_info = '<div class="notice-debug-info" style="color:#888; font-size:10px; margin-top:5px; opacity:0.7;">[Notice Source: ' .
-							( strpos( $notice, 'data-slug' ) !== false ? 'Plugin Update' :
-							( strpos( $notice, 'settings-error' ) !== false ? 'Settings Page' :
-							( strpos( $notice, 'update-message' ) !== false ? 'WordPress Update' : 'Unknown' ) ) ) .
-							']</div>';
+			$source_label = strpos( $notice, 'data-slug' ) !== false
+				? __( 'Plugin Update', 'lukic-code-snippets' )
+				: ( strpos( $notice, 'settings-error' ) !== false
+					? __( 'Settings Page', 'lukic-code-snippets' )
+					: ( strpos( $notice, 'update-message' ) !== false
+						? __( 'WordPress Update', 'lukic-code-snippets' )
+						: __( 'Unknown', 'lukic-code-snippets' ) ) );
+			$debug_info   = '<div class="notice-debug-info">[' .
+				sprintf(
+					/* translators: %s: notice source */
+					esc_html__( 'Notice Source: %s', 'lukic-code-snippets' ),
+					esc_html( $source_label )
+				) .
+				']</div>';
 
 			$notice = str_replace( '</div>', $debug_info . '</div>', $notice );
+			$notice = wp_kses( $notice, Lukic_admin_notifications_allowed_html() );
 
 			// Improved classification logic
 			if ( strpos( $notice, 'notice-error' ) !== false || strpos( $notice, 'error' ) !== false ) {
@@ -193,17 +301,17 @@ if ( ! function_exists( 'Lukic_admin_notifications_manager' ) ) {
 
 		// Create groups for each type
 		$labels = array(
-			'error'   => 'Errors',
-			'warning' => 'Warnings',
-			'success' => 'Success',
-			'info'    => 'Information',
-			'other'   => 'Other Notifications',
+			'error'   => __( 'Errors', 'lukic-code-snippets' ),
+			'warning' => __( 'Warnings', 'lukic-code-snippets' ),
+			'success' => __( 'Success', 'lukic-code-snippets' ),
+			'info'    => __( 'Information', 'lukic-code-snippets' ),
+			'other'   => __( 'Other Notifications', 'lukic-code-snippets' ),
 		);
 
 		foreach ( $types as $type => $type_notices ) {
 			if ( ! empty( $type_notices ) ) {
-				$output .= '<div class="Lukic-notice-group Lukic-notice-group-' . $type . '">';
-				$output .= '<h4>' . $labels[ $type ] . ' (' . count( $type_notices ) . ')</h4>';
+				$output .= '<div class="Lukic-notice-group Lukic-notice-group-' . sanitize_html_class( $type ) . '">';
+				$output .= '<h4>' . esc_html( $labels[ $type ] ) . ' (' . esc_html( count( $type_notices ) ) . ')</h4>';
 				$output .= implode( '', $type_notices );
 				$output .= '</div>';
 			}

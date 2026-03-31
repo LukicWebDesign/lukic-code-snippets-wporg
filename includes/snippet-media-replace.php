@@ -37,7 +37,7 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 	 */
 	function Lukic_media_replace_enqueue_assets( $hook ) {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! isset( $_GET['page'] ) || 'lukic-replace-media' !== sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) {
+		if ( ! isset( $_GET['page'] ) || 'lukic-replace-media' !== sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
 			return;
 		}
 
@@ -84,7 +84,7 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 	function Lukic_media_replace_row_action( $actions, $post ) {
 		if ( current_user_can( 'edit_post', $post->ID ) ) {
 			$url                              = admin_url( 'upload.php?page=lukic-replace-media&attachment_id=' . $post->ID );
-			$actions['Lukic_replace_media'] = '<a href="' . esc_url( $url ) . '">' . __( 'Replace Media', 'lukic-code-snippets' ) . '</a>';
+			$actions['Lukic_replace_media'] = '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Replace Media', 'lukic-code-snippets' ) . '</a>';
 		}
 		return $actions;
 	}
@@ -103,7 +103,7 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 				'label' => '',
 				'input' => 'html',
 				'html'  => '<a href="' . esc_url( $link ) . '" class="button-secondary">' .
-							__( 'Replace Media File', 'lukic-code-snippets' ) . '</a>',
+							esc_html__( 'Replace Media File', 'lukic-code-snippets' ) . '</a>',
 			);
 		}
 		return $form_fields;
@@ -159,7 +159,29 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 
 							<p><?php esc_html_e( 'You need to select a media file to replace. Here\'s how:', 'lukic-code-snippets' ); ?></p>
 								<ol>
-									<li><?php echo wp_kses( __( 'Go to the <a href="upload.php">Media Library</a>', 'lukic-code-snippets' ), array( 'a' => array( 'href' => array() ) ) ); ?></li>
+									<li>
+										<?php
+										printf(
+											/* translators: %s: Media library link */
+											wp_kses(
+												__( 'Go to the %s', 'lukic-code-snippets' ),
+												array()
+											),
+											wp_kses(
+												sprintf(
+													'<a href="%s">%s</a>',
+													esc_url( admin_url( 'upload.php' ) ),
+													esc_html__( 'Media Library', 'lukic-code-snippets' )
+												),
+												array(
+													'a' => array(
+														'href' => array(),
+													),
+												)
+											)
+										);
+										?>
+									</li>
 									<li><?php esc_html_e( 'Find the file you want to replace', 'lukic-code-snippets' ); ?></li>
 									<li><?php esc_html_e( 'Hover over the file and click "Replace Media"', 'lukic-code-snippets' ); ?></li>
 								</ol>
@@ -193,7 +215,6 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 			$filepath       = get_attached_file( $attachment_id );
 			$filename       = basename( $filepath );
 			$filetype       = wp_check_filetype( $filename );
-			$attachment_url = wp_get_attachment_url( $attachment_id );
 			$filesize       = file_exists( $filepath ) ? size_format( filesize( $filepath ), 2 ) : __( 'File not found', 'lukic-code-snippets' );
 
 			// Generate nonce for form
@@ -214,7 +235,7 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 							<div class="thumbnail-container">
 								<?php if ( wp_attachment_is_image( $attachment_id ) ) : ?>
 									<div class="thumbnail">
-										<?php echo wp_get_attachment_image( $attachment_id, array( 150, 150 ) ); ?>
+										<?php echo wp_kses_post( wp_get_attachment_image( $attachment_id, array( 150, 150 ) ) ); ?>
 									</div>
 								<?php endif; ?>
 								
@@ -275,7 +296,16 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 						</form>
 						
 						<div class="notice notice-warning">
-							<p><?php esc_html_e( '<strong>Warning:</strong> This operation cannot be undone. Make sure to backup your files before proceeding.', 'lukic-code-snippets' ); ?></p>
+							<p>
+								<?php
+								echo wp_kses(
+									__( '<strong>Warning:</strong> This operation cannot be undone. Make sure to backup your files before proceeding.', 'lukic-code-snippets' ),
+									array(
+										'strong' => array(),
+									)
+								);
+								?>
+							</p>
 						</div>
 					</div>
 				</div>
@@ -547,7 +577,7 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 			return $url;
 		}
 
-		return add_query_arg( 'Lukic_v', $version, $url );
+		return esc_url_raw( add_query_arg( 'Lukic_v', $version, $url ) );
 	}
 
 	/**
@@ -571,7 +601,7 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 			return $image;
 		}
 
-		$image[0] = add_query_arg( 'Lukic_v', $version, $image[0] );
+		$image[0] = esc_url_raw( add_query_arg( 'Lukic_v', $version, $image[0] ) );
 		return $image;
 	}
 

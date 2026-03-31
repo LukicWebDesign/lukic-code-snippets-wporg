@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function Lukic_add_taxonomy_filters() {
 	global $typenow;
 
-	// Get all taxonomies
+	// Get all taxonomies.
 	$taxonomies = get_taxonomies( array( 'show_ui' => true ), 'objects' );
 
 	if ( empty( $taxonomies ) ) {
@@ -27,19 +27,19 @@ function Lukic_add_taxonomy_filters() {
 	}
 
 	foreach ( $taxonomies as $taxonomy ) {
-		// Skip categories and tags as WordPress already has filters for these
-		if ( in_array( $taxonomy->name, array( 'category', 'post_tag' ) ) ) {
+		// Skip categories and tags as WordPress already has filters for these.
+		if ( in_array( $taxonomy->name, array( 'category', 'post_tag' ), true ) ) {
 			continue;
 		}
 
-		// Check if this taxonomy is registered for the current post type
+		// Check if this taxonomy is registered for the current post type.
 		$post_types = $taxonomy->object_type;
 
-		if ( empty( $post_types ) || ! in_array( $typenow, $post_types ) ) {
+		if ( empty( $post_types ) || ! in_array( $typenow, $post_types, true ) ) {
 			continue;
 		}
 
-		// Get the taxonomy terms
+		// Get the taxonomy terms.
 		$terms = get_terms(
 			array(
 				'taxonomy'   => $taxonomy->name,
@@ -47,11 +47,11 @@ function Lukic_add_taxonomy_filters() {
 			)
 		);
 
-		if ( empty( $terms ) ) {
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
 			continue;
 		}
 
-		// Display filter dropdown
+		// Display filter dropdown.
 		echo '<select name="' . esc_attr( $taxonomy->name ) . '" id="' . esc_attr( $taxonomy->name ) . '" class="postform">';
 		/* translators: %s: Taxonomy label (e.g., Categories, Tags) */
 		echo '<option value="">' . sprintf( esc_html__( 'All %s', 'lukic-code-snippets' ), esc_html( $taxonomy->label ) ) . '</option>';
@@ -78,20 +78,17 @@ function Lukic_display_taxonomy_terms( $terms, $taxonomy, $parent = 0, $level = 
 	$selected     = in_array( $selected_raw, $term_slugs, true ) ? $selected_raw : '';
 
 	foreach ( $terms as $term ) {
-		if ( $term->parent == $parent ) {
-			// Create indentation for hierarchical terms
-			$indent = '';
-			for ( $i = 0; $i < $level; $i++ ) {
-				$indent .= '&mdash; ';
-			}
+		if ( (int) $term->parent === (int) $parent ) {
+			// Create indentation for hierarchical terms.
+			$indent = str_repeat( '- ', max( 0, (int) $level ) );
 
-			// Display the term as an option
+			// Display the term as an option.
 			echo '<option value="' . esc_attr( $term->slug ) . '" ' . selected( $selected, $term->slug, false ) . '>'
 				. esc_html( $indent . $term->name )
-				. ' (' . intval( $term->count ) . ')'
+				. ' (' . esc_html( (string) intval( $term->count ) ) . ')'
 				. '</option>';
 
-			// Display child terms with increased level
+			// Display child terms with increased level.
 			Lukic_display_taxonomy_terms( $terms, $taxonomy, $term->term_id, $level + 1 );
 		}
 	}

@@ -23,7 +23,7 @@ function Lukic_get_orderable_post_types() {
 	$post_types = array_merge( $default_post_types, $custom_post_types );
 
 	// Filter to allow themes/plugins to modify the list
-	return apply_filters( 'Lukic_content_order_post_types', $post_types );
+	return array_values( array_filter( array_map( 'sanitize_key', apply_filters( 'Lukic_content_order_post_types', $post_types ) ) ) );
 }
 
 /**
@@ -31,8 +31,32 @@ function Lukic_get_orderable_post_types() {
  */
 function Lukic_is_frontend_ordering_enabled( $post_type ) {
 	$settings = get_option( 'Lukic_content_order_settings', array() );
-	$key      = 'frontend_' . $post_type;
+	$key      = 'frontend_' . sanitize_key( $post_type );
 	return isset( $settings[ $key ] ) ? (bool) $settings[ $key ] : false;
+}
+
+/**
+ * Resolve the requested order screen post type from the page slug.
+ *
+ * @param string $page Page slug.
+ * @return string
+ */
+function Lukic_content_order_resolve_post_type_from_page( $page ) {
+	$page = sanitize_key( $page );
+
+	if ( 'lukic-order-post' === $page ) {
+		return 'post';
+	}
+
+	if ( 'lukic-order-page' === $page ) {
+		return 'page';
+	}
+
+	if ( strpos( $page, 'lukic-order-' ) === 0 ) {
+		return sanitize_key( str_replace( 'lukic-order-', '', $page ) );
+	}
+
+	return '';
 }
 
 /**
@@ -111,7 +135,7 @@ function Lukic_content_order_set_default_order( $query ) {
 		// Get all orderable post types
 		$orderable_post_types = Lukic_get_orderable_post_types();
 
-		if ( in_array( $post_type, $orderable_post_types ) ) {
+		if ( is_string( $post_type ) && in_array( $post_type, $orderable_post_types, true ) ) {
 			$query->set( 'orderby', 'menu_order title' );
 			$query->set( 'order', 'ASC' );
 		}
@@ -123,6 +147,10 @@ function Lukic_content_order_set_default_order( $query ) {
 	$post_type = $query->get( 'post_type' );
 
 	// Default to 'post' if no post type is set
+	if ( is_array( $post_type ) ) {
+		return $query;
+	}
+
 	if ( empty( $post_type ) ) {
 		$post_type = 'post';
 	}
@@ -131,7 +159,7 @@ function Lukic_content_order_set_default_order( $query ) {
 	$orderable_post_types = Lukic_get_orderable_post_types();
 
 	// Only apply if this is an orderable post type and frontend ordering is enabled
-	if ( in_array( $post_type, $orderable_post_types ) && Lukic_is_frontend_ordering_enabled( $post_type ) ) {
+	if ( in_array( $post_type, $orderable_post_types, true ) && Lukic_is_frontend_ordering_enabled( $post_type ) ) {
 		// Don't override if a specific orderby is already set (unless it's 'date')
 		$current_orderby = $query->get( 'orderby' );
 		if ( empty( $current_orderby ) || $current_orderby === 'date' ) {
@@ -159,12 +187,15 @@ function Lukic_content_order_block_query_args( $query, $block, $page ) {
 	}
 
 	$post_type = $query['post_type'];
+	if ( is_array( $post_type ) ) {
+		return $query;
+	}
 
 	// Get all orderable post types
 	$orderable_post_types = Lukic_get_orderable_post_types();
 
 	// Apply custom ordering if enabled for this post type
-	if ( in_array( $post_type, $orderable_post_types ) && Lukic_is_frontend_ordering_enabled( $post_type ) ) {
+	if ( in_array( $post_type, $orderable_post_types, true ) && Lukic_is_frontend_ordering_enabled( $post_type ) ) {
 		// Only override if no specific orderby is set, or if it's set to 'date'
 		if ( ! isset( $query['orderby'] ) || $query['orderby'] === 'date' ) {
 			$query['orderby'] = 'menu_order title';
@@ -182,7 +213,7 @@ add_filter( 'query_loop_block_query_vars', 'Lukic_content_order_block_query_args
 function Lukic_content_order_scripts( $hook ) {
 	// Check if we're on one of our order pages
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+	$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
 	if ( strpos( $page, 'lukic-order-' ) === 0 ) {
 		// CSS is now handled by the main plugin
 
@@ -221,7 +252,7 @@ function Lukic_update_post_order() {
 
 	// Get and validate data
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$post_type = isset( $_POST['post_type'] ) ? sanitize_text_field( wp_unslash( $_POST['post_type'] ) ) : '';
+	$post_type = isset( $_POST['post_type'] ) ? sanitize_key( wp_unslash( $_POST['post_type'] ) ) : '';
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	$post_ids  = isset( $_POST['post_ids'] ) ? array_values( array_filter( array_map( 'absint', wp_unslash( (array) $_POST['post_ids'] ) ) ) ) : array();
 
@@ -283,21 +314,10 @@ add_action( 'wp_ajax_Lukic_update_post_order', 'Lukic_update_post_order' );
 function Lukic_content_order_interface() {
 	// Get current page slug
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+	$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
 
 	// Determine post type from page slug
-	$post_type = '';
-	if ( $page === 'lukic-order-post' ) {
-		$post_type = 'post';
-	} elseif ( $page === 'lukic-order-page' ) {
-		$post_type = 'page';
-	} else {
-		// Try to extract from the page name
-		$prefix = 'lukic-order-';
-		if ( strpos( $page, $prefix ) === 0 ) {
-			$post_type = str_replace( $prefix, '', $page );
-		}
-	}
+	$post_type = Lukic_content_order_resolve_post_type_from_page( $page );
 
 	// Final check for valid post type
 	if ( empty( $post_type ) || ! post_type_exists( $post_type ) ) {
@@ -531,7 +551,7 @@ function Lukic_content_order_settings_page() {
 
 											$post_type_obj = get_post_type_object( $post_type );
 											$key           = 'frontend_' . $post_type;
-											$checked       = isset( $current_settings[ $key ] ) && $current_settings[ $key ] ? 'checked' : '';
+											$checked       = isset( $current_settings[ $key ] ) && $current_settings[ $key ];
 											?>
 											<tr>
 												<th scope="row">
@@ -547,7 +567,7 @@ function Lukic_content_order_settings_page() {
 																name="<?php echo esc_attr( $key ); ?>" 
 																id="<?php echo esc_attr( $key ); ?>" 
 																value="1" 
-																<?php echo esc_attr( $checked ); ?>
+																<?php checked( $checked ); ?>
 															/>
 															<?php
 															/* translators: %s: Post type name (e.g., Posts, Pages) */
@@ -622,11 +642,11 @@ function Lukic_content_order_debug() {
 	if ( current_user_can( 'manage_options' ) ) {
 		$screen     = get_current_screen();
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$page       = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+		$page       = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
 		$post_types = Lukic_get_orderable_post_types();
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- This is a debug HTML comment
-		echo "<!-- Lukic Content Order snippet is active. Current screen: " . esc_html( $screen->id ) . ", " . esc_html( $screen->base ) . ". Page: " . esc_html( $page ) . ". Post types: " . esc_html( implode( ', ', $post_types ) ) . " -->";
+		echo '<!-- Lukic Content Order snippet is active. Current screen: ' . esc_html( $screen ? $screen->id : '' ) . ', ' . esc_html( $screen ? $screen->base : '' ) . '. Page: ' . esc_html( $page ) . '. Post types: ' . esc_html( implode( ', ', $post_types ) ) . ' -->';
 	}
 }
 add_action( 'admin_footer', 'Lukic_content_order_debug' );

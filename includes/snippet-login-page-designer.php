@@ -139,42 +139,50 @@ class Lukic_Login_Page_Designer {
 	 * @return array Sanitized values.
 	 */
 	public function sanitize_settings( $input ) {
+		if ( ! is_array( $input ) ) {
+			$input = array();
+		}
+
 		$out = array();
 
 		// Logo
-		$out['logo_url']      = isset( $input['logo_url'] )      ? esc_url_raw( $input['logo_url'] )         : '';
-		$out['logo_width']    = isset( $input['logo_width'] )    ? absint( $input['logo_width'] )             : $this->defaults['logo_width'];
-		$out['logo_link_url'] = isset( $input['logo_link_url'] ) ? esc_url_raw( $input['logo_link_url'] )     : '';
-		$out['logo_alt_text'] = isset( $input['logo_alt_text'] ) ? sanitize_text_field( $input['logo_alt_text'] ) : '';
+		$out['logo_url']      = isset( $input['logo_url'] ) ? esc_url_raw( wp_unslash( $input['logo_url'] ) ) : '';
+		$out['logo_width']    = isset( $input['logo_width'] ) ? max( 40, min( 320, absint( $input['logo_width'] ) ) ) : $this->defaults['logo_width'];
+		$out['logo_link_url'] = isset( $input['logo_link_url'] ) ? esc_url_raw( wp_unslash( $input['logo_link_url'] ) ) : '';
+		$out['logo_alt_text'] = isset( $input['logo_alt_text'] ) ? sanitize_text_field( wp_unslash( $input['logo_alt_text'] ) ) : '';
 
 		// Background
 		$bg_types      = array( 'color', 'image', 'gradient' );
-		$out['bg_type'] = ( isset( $input['bg_type'] ) && in_array( $input['bg_type'], $bg_types, true ) )
-			? $input['bg_type']
+		$bg_type       = isset( $input['bg_type'] ) ? sanitize_key( wp_unslash( $input['bg_type'] ) ) : '';
+		$out['bg_type'] = in_array( $bg_type, $bg_types, true )
+			? $bg_type
 			: $this->defaults['bg_type'];
 
 		$out['bg_color']          = $this->sanitize_color( $input['bg_color'] ?? $this->defaults['bg_color'] );
-		$out['bg_image']          = isset( $input['bg_image'] ) ? esc_url_raw( $input['bg_image'] ) : '';
+		$out['bg_image']          = isset( $input['bg_image'] ) ? esc_url_raw( wp_unslash( $input['bg_image'] ) ) : '';
 		$out['bg_gradient_from']  = $this->sanitize_color( $input['bg_gradient_from'] ?? $this->defaults['bg_gradient_from'] );
 		$out['bg_gradient_to']    = $this->sanitize_color( $input['bg_gradient_to'] ?? $this->defaults['bg_gradient_to'] );
-		$out['bg_gradient_angle'] = isset( $input['bg_gradient_angle'] ) ? absint( $input['bg_gradient_angle'] ) : $this->defaults['bg_gradient_angle'];
+		$out['bg_gradient_angle'] = isset( $input['bg_gradient_angle'] ) ? max( 0, min( 360, absint( $input['bg_gradient_angle'] ) ) ) : $this->defaults['bg_gradient_angle'];
 
 		$bg_positions         = array( 'center center', 'top center', 'bottom center', 'center left', 'center right' );
-		$out['bg_position']   = ( isset( $input['bg_position'] ) && in_array( $input['bg_position'], $bg_positions, true ) )
-			? $input['bg_position']
+		$bg_position          = isset( $input['bg_position'] ) ? sanitize_text_field( wp_unslash( $input['bg_position'] ) ) : '';
+		$out['bg_position']   = in_array( $bg_position, $bg_positions, true )
+			? $bg_position
 			: $this->defaults['bg_position'];
 
 		$bg_sizes       = array( 'cover', 'contain', 'auto' );
-		$out['bg_size'] = ( isset( $input['bg_size'] ) && in_array( $input['bg_size'], $bg_sizes, true ) )
-			? $input['bg_size']
+		$bg_size        = isset( $input['bg_size'] ) ? sanitize_key( wp_unslash( $input['bg_size'] ) ) : '';
+		$out['bg_size'] = in_array( $bg_size, $bg_sizes, true )
+			? $bg_size
 			: $this->defaults['bg_size'];
 
 		// Form card
 		$out['card_bg_color']      = $this->sanitize_color( $input['card_bg_color'] ?? $this->defaults['card_bg_color'] );
-		$out['card_border_radius'] = isset( $input['card_border_radius'] ) ? absint( $input['card_border_radius'] ) : $this->defaults['card_border_radius'];
+		$out['card_border_radius'] = isset( $input['card_border_radius'] ) ? min( 40, absint( $input['card_border_radius'] ) ) : $this->defaults['card_border_radius'];
 		$shadow_options            = array( 'none', 'soft', 'strong' );
-		$out['card_shadow']        = ( isset( $input['card_shadow'] ) && in_array( $input['card_shadow'], $shadow_options, true ) )
-			? $input['card_shadow']
+		$card_shadow               = isset( $input['card_shadow'] ) ? sanitize_key( wp_unslash( $input['card_shadow'] ) ) : '';
+		$out['card_shadow']        = in_array( $card_shadow, $shadow_options, true )
+			? $card_shadow
 			: $this->defaults['card_shadow'];
 
 		// Colors
@@ -188,10 +196,10 @@ class Lukic_Login_Page_Designer {
 		$out['btn_bg_color']       = $this->sanitize_color( $input['btn_bg_color'] ?? $this->defaults['btn_bg_color'] );
 		$out['btn_text_color']     = $this->sanitize_color( $input['btn_text_color'] ?? $this->defaults['btn_text_color'] );
 		$out['btn_hover_bg_color'] = $this->sanitize_color( $input['btn_hover_bg_color'] ?? $this->defaults['btn_hover_bg_color'] );
-		$out['btn_border_radius']  = isset( $input['btn_border_radius'] ) ? absint( $input['btn_border_radius'] ) : $this->defaults['btn_border_radius'];
+		$out['btn_border_radius']  = isset( $input['btn_border_radius'] ) ? min( 50, absint( $input['btn_border_radius'] ) ) : $this->defaults['btn_border_radius'];
 
-		// Custom CSS – strip PHP tags but allow CSS
-		$out['custom_css'] = isset( $input['custom_css'] ) ? wp_strip_all_tags( $input['custom_css'] ) : '';
+		// Custom CSS is disabled in the wp.org-safe build.
+		$out['custom_css'] = '';
 
 		return $out;
 	}
@@ -203,6 +211,7 @@ class Lukic_Login_Page_Designer {
 	 * @return string Sanitized color or empty string.
 	 */
 	private function sanitize_color( $color ) {
+		$color = is_string( $color ) ? wp_unslash( $color ) : '';
 		$color = trim( $color );
 		// Hex
 		if ( preg_match( '/^#([a-fA-F0-9]{3}){1,2}$/', $color ) ) {
@@ -226,7 +235,7 @@ class Lukic_Login_Page_Designer {
 	 */
 	public function enqueue_admin_scripts( $hook ) {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! isset( $_GET['page'] ) || 'lukic-login-page-designer' !== sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) {
+		if ( ! isset( $_GET['page'] ) || 'lukic-login-page-designer' !== sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
 			return;
 		}
 
@@ -258,9 +267,11 @@ class Lukic_Login_Page_Designer {
 	 * Enqueue custom CSS for the login page.
 	 */
 	public function inject_login_styles() {
-		$opts = wp_parse_args(
-			get_option( $this->option_name, array() ),
-			$this->defaults
+		$opts = $this->sanitize_settings(
+			wp_parse_args(
+				get_option( $this->option_name, array() ),
+				$this->defaults
+			)
 		);
 
 		// Build the background declaration
@@ -310,10 +321,6 @@ class Lukic_Login_Page_Designer {
 		$css .= "\tbackground-color: {$opts['btn_hover_bg_color']} !important;\n";
 		$css .= "\tborder-color: {$opts['btn_hover_bg_color']} !important;\n}\n";
 
-		if ( ! empty( $opts['custom_css'] ) ) {
-			$css .= wp_strip_all_tags( $opts['custom_css'] ) . "\n";
-		}
-
 		wp_register_style( 'lukic-login-designer', false, array(), Lukic_SNIPPET_CODES_VERSION );
 		wp_enqueue_style( 'lukic-login-designer' );
 		wp_add_inline_style( 'lukic-login-designer', $css );
@@ -321,10 +328,10 @@ class Lukic_Login_Page_Designer {
 		// Override logo link & title if set
 		if ( ! empty( $opts['logo_link_url'] ) || ! empty( $opts['logo_alt_text'] ) ) {
 			add_filter( 'login_headerurl', function() use ( $opts ) {
-				return ! empty( $opts['logo_link_url'] ) ? esc_url( $opts['logo_link_url'] ) : home_url();
+				return ! empty( $opts['logo_link_url'] ) ? esc_url_raw( $opts['logo_link_url'] ) : home_url();
 			} );
 			add_filter( 'login_headertext', function() use ( $opts ) {
-				return ! empty( $opts['logo_alt_text'] ) ? esc_html( $opts['logo_alt_text'] ) : get_bloginfo( 'name' );
+				return ! empty( $opts['logo_alt_text'] ) ? sanitize_text_field( $opts['logo_alt_text'] ) : get_bloginfo( 'name' );
 			} );
 		}
 	}
@@ -341,25 +348,25 @@ class Lukic_Login_Page_Designer {
 		switch ( $opts['bg_type'] ) {
 			case 'image':
 				if ( ! empty( $opts['bg_image'] ) ) {
-					$css .= 'background-image: url("' . esc_url( $opts['bg_image'] ) . '");';
-					$css .= 'background-position: ' . esc_attr( $opts['bg_position'] ) . ';';
-					$css .= 'background-size: ' . esc_attr( $opts['bg_size'] ) . ';';
+					$css .= 'background-image: url("' . esc_url_raw( $opts['bg_image'] ) . '");';
+					$css .= 'background-position: ' . $opts['bg_position'] . ';';
+					$css .= 'background-size: ' . $opts['bg_size'] . ';';
 					$css .= 'background-repeat: no-repeat;';
 				} else {
-					$css .= 'background-color: ' . esc_attr( $opts['bg_color'] ) . ';';
+					$css .= 'background-color: ' . $opts['bg_color'] . ';';
 				}
 				break;
 
 			case 'gradient':
 				$angle = absint( $opts['bg_gradient_angle'] );
-				$from  = esc_attr( $opts['bg_gradient_from'] );
-				$to    = esc_attr( $opts['bg_gradient_to'] );
+				$from  = $opts['bg_gradient_from'];
+				$to    = $opts['bg_gradient_to'];
 				$css  .= 'background: linear-gradient(' . $angle . 'deg, ' . $from . ', ' . $to . ');';
 				break;
 
 			case 'color':
 			default:
-				$css .= 'background-color: ' . esc_attr( $opts['bg_color'] ) . ';';
+				$css .= 'background-color: ' . $opts['bg_color'] . ';';
 				break;
 		}
 
@@ -374,7 +381,7 @@ class Lukic_Login_Page_Designer {
 	 * Render the settings page.
 	 */
 	public function display_settings_page() {
-		$opts  = wp_parse_args( get_option( $this->option_name, array() ), $this->defaults );
+		$opts  = $this->sanitize_settings( wp_parse_args( get_option( $this->option_name, array() ), $this->defaults ) );
 		$stats = array(
 			array(
 				'count' => ucfirst( $opts['bg_type'] ),
@@ -718,11 +725,13 @@ class Lukic_Login_Page_Designer {
 							<div class="Lukic-field-row">
 								<label for="lpd_custom_css"><?php esc_html_e( 'Additional CSS', 'lukic-code-snippets' ); ?></label>
 								<textarea id="lpd_custom_css"
-									name="<?php echo esc_attr( $this->option_name ); ?>[custom_css]"
+									name="<?php echo esc_attr( $this->option_name ); ?>[custom_css_disabled]"
 									rows="8"
 									class="large-text code"
-									placeholder="/* e.g. body.login { font-family: 'Georgia', serif; } */"><?php echo esc_textarea( $opts['custom_css'] ); ?></textarea>
-								<p class="description"><?php esc_html_e( 'Add any CSS you want to inject into the login page. Applied last — overrides everything above.', 'lukic-code-snippets' ); ?></p>
+									disabled="disabled"
+									readonly="readonly"
+									placeholder="/* Custom CSS is disabled in this build. */"></textarea>
+								<p class="description"><?php esc_html_e( 'Arbitrary custom CSS is disabled in this WordPress.org-safe build. Use the structured options above instead.', 'lukic-code-snippets' ); ?></p>
 							</div>
 						</div>
 

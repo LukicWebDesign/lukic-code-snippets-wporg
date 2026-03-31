@@ -19,6 +19,45 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 		private $option_name = 'lukic_admin_menu_settings';
 
 		/**
+		 * Read and sanitize stored menu settings.
+		 *
+		 * @return array
+		 */
+		private function get_sanitized_settings() {
+			$settings = get_option( $this->option_name, array() );
+			if ( ! is_array( $settings ) ) {
+				return array();
+			}
+
+			$clean_settings = array();
+			foreach ( $settings as $slug => $config ) {
+				$slug = $this->sanitize_menu_slug( $slug );
+				if ( '' === $slug || ! is_array( $config ) ) {
+					continue;
+				}
+
+				$clean_settings[ $slug ] = array(
+					'position' => isset( $config['position'] ) ? absint( $config['position'] ) : 0,
+					'title'    => isset( $config['title'] ) ? sanitize_text_field( $config['title'] ) : '',
+					'hidden'   => ! empty( $config['hidden'] ),
+				);
+			}
+
+			return $clean_settings;
+		}
+
+		/**
+		 * Sanitize a stored menu slug while preserving core query-string slugs.
+		 *
+		 * @param string $slug Raw slug.
+		 * @return string
+		 */
+		private function sanitize_menu_slug( $slug ) {
+			$slug = is_string( $slug ) ? sanitize_text_field( wp_unslash( $slug ) ) : '';
+			return preg_replace( '/[^A-Za-z0-9_\-\.?=&\/]/', '', $slug );
+		}
+
+		/**
 		 * Constructor
 		 */
 		public function __construct() {
@@ -59,7 +98,7 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 		public function enqueue_scripts( $hook ) {
 			// Only load on our specific page
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( isset( $_GET['page'] ) && sanitize_text_field( wp_unslash( $_GET['page'] ) ) === 'lukic-admin-menu-organizer' ) {
+			if ( isset( $_GET['page'] ) && sanitize_key( wp_unslash( $_GET['page'] ) ) === 'lukic-admin-menu-organizer' ) {
 				wp_enqueue_script( 'jquery-ui-sortable' );
 				
 				wp_register_style( 'Lukic-admin-menu-styles', false );
@@ -146,7 +185,7 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 			}
 			
 			// Add script for "Show All" toggle on all admin pages if needed
-			$settings = get_option( $this->option_name, array() );
+			$settings = $this->get_sanitized_settings();
 			if ( ! empty( $settings ) ) {
 				wp_enqueue_script( 'jquery' );
 				wp_add_inline_script( 'jquery', '
@@ -174,7 +213,7 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 				return;
 			}
 
-			$settings = get_option( $this->option_name, array() );
+			$settings = $this->get_sanitized_settings();
 			if ( empty( $settings ) ) {
 				return;
 			}
@@ -246,7 +285,7 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 		 * Output custom CSS to hide items
 		 */
 		public function output_custom_css() {
-			$settings = get_option( $this->option_name, array() );
+			$settings = $this->get_sanitized_settings();
 			if ( empty( $settings ) ) {
 				return;
 			}
@@ -260,7 +299,7 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 					
 					$id = $this->get_menu_id_from_slug( $slug );
 					if ( $id ) {
-						$css .= "#$id { display: none !important; }\n";
+						$css .= '#' . $id . " { display: none !important; }\n";
 					}
 				}
 			}
@@ -304,7 +343,7 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 			// Custom post types: menu-posts-post_type
 			if ( strpos( $slug, 'edit.php?post_type=' ) === 0 ) {
 				$pt = str_replace( 'edit.php?post_type=', '', $slug );
-				return 'menu-posts-' . $pt;
+				return sanitize_html_class( 'menu-posts-' . sanitize_key( $pt ) );
 			}
 
 			// Separators
@@ -315,7 +354,7 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 			}
 
 			// Plugins: toplevel_page_slug
-			return 'toplevel_page_' . $slug;
+			return sanitize_html_class( 'toplevel_page_' . sanitize_title( $slug ) );
 		}
 
 			// Toggle button logic moved to enqueue_scripts
@@ -327,7 +366,7 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 			global $menu;
 
 			// Get saved settings
-			$settings = get_option( $this->option_name, array() );
+			$settings = $this->get_sanitized_settings();
 
 			// Prepare menu items for display
 			// We want to merge current menu items with saved settings to ensure we show everything
@@ -342,7 +381,6 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 				foreach ( $settings as $slug => $config ) {
 					// Find original title if possible
 					$original_title = $config['title'];
-					$original_icon = 'dashicons-admin-generic'; // Default
 					$is_separator = false;
 					
 					// Try to find in current global menu to get real current title/icon
@@ -472,10 +510,15 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 			$clean_settings = array();
 			if ( is_array( $settings ) ) {
 				foreach ( $settings as $slug => $config ) {
-					$clean_settings[ sanitize_text_field( $slug ) ] = array(
-						'position' => absint( $config['position'] ),
-						'title' => sanitize_text_field( $config['title'] ),
-						'hidden' => ! empty( $config['hidden'] ),
+					$slug = $this->sanitize_menu_slug( $slug );
+					if ( '' === $slug || ! is_array( $config ) ) {
+						continue;
+					}
+
+					$clean_settings[ $slug ] = array(
+						'position' => isset( $config['position'] ) ? absint( $config['position'] ) : 0,
+						'title'    => isset( $config['title'] ) ? sanitize_text_field( $config['title'] ) : '',
+						'hidden'   => ! empty( $config['hidden'] ),
 					);
 				}
 			}
