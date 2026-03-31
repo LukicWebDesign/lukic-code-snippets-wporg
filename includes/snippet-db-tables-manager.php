@@ -11,6 +11,20 @@ if ( ! defined( 'WPINC' ) ) {
 
 class Lukic_DB_Tables_Manager {
 	/**
+	 * Cache of validated schema columns by table name.
+	 *
+	 * @var array
+	 */
+	private $table_schema_cache = array();
+
+	/**
+	 * Cache of validated table names.
+	 *
+	 * @var array|null
+	 */
+	private $validated_tables = null;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -384,16 +398,19 @@ class Lukic_DB_Tables_Manager {
 		}
 
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$table = isset( $_POST['table'] ) ? sanitize_text_field( wp_unslash( $_POST['table'] ) ) : '';
-		global $wpdb;
-		$table = $this->validate_table_name( $table );
+		$table   = isset( $_POST['table'] ) ? sanitize_text_field( wp_unslash( $_POST['table'] ) ) : '';
+		$table   = $this->validate_table_name( $table );
+		$columns = $table ? $this->get_safe_table_columns( $table ) : array();
 		if ( ! $table ) {
 			wp_send_json_error( __( 'Invalid table specified.', 'lukic-code-snippets' ) );
 		}
+		$columns        = $this->get_safe_table_columns( $table );
+		$safe_table     = $this->quote_identifier( $table );
+		$select_columns = $this->get_safe_select_columns_sql( $columns );
 
 		// Get table structure — $table is validated by validate_table_name().
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$columns = $wpdb->get_results( "DESCRIBE `{$table}`" );
+		
 
 		if ( empty( $columns ) ) {
 			wp_send_json_error( __( 'Could not retrieve table structure.', 'lukic-code-snippets' ) );
@@ -457,17 +474,24 @@ class Lukic_DB_Tables_Manager {
 		if ( ! $table ) {
 			wp_send_json_error( __( 'Invalid table specified.', 'lukic-code-snippets' ) );
 		}
+		$columns        = $this->get_safe_table_columns( $table );
+		$safe_table     = $this->quote_identifier( $table );
+		$select_columns = $this->get_safe_select_columns_sql( $columns );
+		$primary_column = $this->get_primary_key_column( $columns );
+		if ( empty( $columns ) || '' === $select_columns ) {
+			wp_send_json_error( __( 'Could not retrieve table structure.', 'lukic-code-snippets' ) );
+		}
 
 		// Get total rows count — $table is validated by validate_table_name().
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$total_rows = $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
+		$total_rows = $wpdb->get_var( "SELECT COUNT(*) FROM {$safe_table}" );
 
 		// Calculate offset
 		$offset = ( $page - 1 ) * $per_page;
 
 		// Get data with pagination — use prepare() for LIMIT params.
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `{$table}` LIMIT %d, %d", $offset, $per_page ), ARRAY_A );
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT {$select_columns} FROM {$safe_table} LIMIT %d, %d", $offset, $per_page ), ARRAY_A );
 
 		if ( $rows === null ) {
 			wp_send_json_error( __( 'Error retrieving data from table.', 'lukic-code-snippets' ) . ' ' . $wpdb->last_error );
@@ -497,14 +521,7 @@ class Lukic_DB_Tables_Manager {
 
 		// Get table structure to identify primary key — $table is validated.
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$columns     = $wpdb->get_results( "DESCRIBE `{$table}`" );
-		$primary_key = null;
-		foreach ( $columns as $column ) {
-			if ( $column->Key === 'PRI' ) {
-				$primary_key = $column->Field;
-				break;
-			}
-		}
+		$primary_key = $primary_column ? $primary_column->Field : null;
 
 		ob_start();
 		?>
@@ -582,10 +599,17 @@ class Lukic_DB_Tables_Manager {
 		if ( ! $table ) {
 			wp_send_json_error( __( 'Invalid table specified.', 'lukic-code-snippets' ) );
 		}
+		$columns        = $this->get_safe_table_columns( $table );
+		$safe_table     = $this->quote_identifier( $table );
+		$select_columns = $this->get_safe_select_columns_sql( $columns );
+
+		if ( empty( $columns ) || '' === $select_columns ) {
+			wp_send_json_error( __( 'Could not retrieve table structure.', 'lukic-code-snippets' ) );
+		}
 
 		// Get all data from the table — $table is validated by validate_table_name().
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$rows = $wpdb->get_results( "SELECT * FROM `{$table}`", ARRAY_A );
+		$rows = $wpdb->get_results( "SELECT {$select_columns} FROM {$safe_table}", ARRAY_A );
 
 		if ( empty( $rows ) ) {
 			wp_send_json_error( __( 'No data to export.', 'lukic-code-snippets' ) );
@@ -640,6 +664,9 @@ class Lukic_DB_Tables_Manager {
 		if ( ! $table ) {
 			wp_send_json_error( __( 'Invalid table specified.', 'lukic-code-snippets' ) );
 		}
+		$columns        = $this->get_safe_table_columns( $table );
+		$safe_table     = $this->quote_identifier( $table );
+		$select_columns = $this->get_safe_select_columns_sql( $columns );
 
 		$primary_key = $this->validate_column_name( $primary_key );
 		if ( ! $primary_key ) {
@@ -652,17 +679,22 @@ class Lukic_DB_Tables_Manager {
 
 		// Get table structure — $table is validated by validate_table_name().
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$columns      = $wpdb->get_results( "DESCRIBE `{$table}`" );
-		$column_names = wp_list_pluck( $columns, 'Field' );
-		if ( ! in_array( $primary_key, $column_names, true ) ) {
+		if ( empty( $columns ) || '' === $select_columns || ! isset( $columns[ $primary_key ] ) ) {
 			wp_send_json_error( __( 'Invalid primary key.', 'lukic-code-snippets' ) );
+		}
+		$primary_column = $columns[ $primary_key ];
+		$primary_value  = $this->normalize_column_value( $primary_value, $primary_column );
+		$placeholder    = $this->get_column_placeholder( $primary_column->Type );
+
+		if ( null === $primary_value ) {
+			wp_send_json_error( __( 'Missing required parameters.', 'lukic-code-snippets' ) );
 		}
 
 		// Get the specific row
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM `{$table}` WHERE `{$primary_key}` = %s",
+				"SELECT {$select_columns} FROM {$safe_table} WHERE " . $this->quote_identifier( $primary_key ) . " = {$placeholder}",
 				$primary_value
 			),
 			ARRAY_A
@@ -705,21 +737,30 @@ class Lukic_DB_Tables_Manager {
 		if ( ! $table ) {
 			wp_send_json_error( __( 'Invalid table specified.', 'lukic-code-snippets' ) );
 		}
+		$columns = $this->get_safe_table_columns( $table );
 
 		$primary_key = $this->validate_column_name( $primary_key );
 		if ( ! $primary_key || empty( $primary_value ) || empty( $row_data ) ) {
 			wp_send_json_error( __( 'Missing required parameters.', 'lukic-code-snippets' ) );
 		}
+		if ( empty( $columns ) || ! isset( $columns[ $primary_key ] ) ) {
+			wp_send_json_error( __( 'Invalid primary key.', 'lukic-code-snippets' ) );
+		}
+		$primary_column = $columns[ $primary_key ];
+		$primary_value  = $this->normalize_column_value( $primary_value, $primary_column );
+		if ( null === $primary_value ) {
+			wp_send_json_error( __( 'Missing required parameters.', 'lukic-code-snippets' ) );
+		}
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$columns      = $wpdb->get_results( "DESCRIBE `{$table}`" );
-		$column_names = wp_list_pluck( $columns, 'Field' );
-		// Sanitize the row data
+		// Normalize row data against the validated schema.
 		$update_data   = array();
 		$update_format = array();
 		foreach ( $row_data as $column => $value ) {
 			$column = $this->validate_column_name( $column );
-			if ( ! $column || ! in_array( $column, $column_names, true ) ) {
+			if ( ! $column || ! isset( $columns[ $column ] ) ) {
+				continue;
+			}
+			if ( $column === $primary_key ) {
 				continue;
 			}
 
@@ -727,18 +768,9 @@ class Lukic_DB_Tables_Manager {
 				continue;
 			}
 
-			// Handle NULL values
-			if ( $value === 'NULL' || $value === '' ) {
-				$update_data[ $column ] = null;
-				$update_format[]        = '%s';
-			} else {
-				$update_data[ $column ] = sanitize_textarea_field( $value );
-				$update_format[]        = '%s';
-			}
+			$update_data[ $column ] = $this->normalize_column_value( $value, $columns[ $column ] );
+			$update_format[]        = $this->get_column_placeholder( $columns[ $column ]->Type );
 		}
-
-		// Remove primary key from update data (shouldn't be updated)
-		unset( $update_data[ $primary_key ] );
 
 		if ( empty( $update_data ) ) {
 			wp_send_json_error( __( 'No data to update.', 'lukic-code-snippets' ) );
@@ -751,7 +783,7 @@ class Lukic_DB_Tables_Manager {
 			$update_data,
 			array( $primary_key => $primary_value ),
 			$update_format,
-			array( '%s' )
+			array( $this->get_column_placeholder( $primary_column->Type ) )
 		);
 
 		if ( $result === false ) {
@@ -789,33 +821,20 @@ class Lukic_DB_Tables_Manager {
 
 		// Get table structure to build search query — $table is validated.
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$columns = $wpdb->get_results( "DESCRIBE `{$table}`" );
-
-		if ( empty( $columns ) ) {
+		$columns        = $this->get_safe_table_columns( $table );
+		$safe_table     = $this->quote_identifier( $table );
+		$select_columns = $this->get_safe_select_columns_sql( $columns );
+		$primary_column = $this->get_primary_key_column( $columns );
+		if ( empty( $columns ) || '' === $select_columns ) {
 			wp_send_json_error( __( 'Could not retrieve table structure.', 'lukic-code-snippets' ) );
 		}
 
-		// Build WHERE clause for search
-		$where_conditions = array();
-		$search_value     = '%' . $wpdb->esc_like( $search_term ) . '%';
-
-		foreach ( $columns as $column ) {
-			$where_conditions[] = "`{$column->Field}` LIKE %s";
-		}
-
-		$where_clause = '';
-		if ( ! empty( $search_term ) && ! empty( $where_conditions ) ) {
-			$where_clause = 'WHERE (' . implode( ' OR ', $where_conditions ) . ')';
-		}
-
-		// Prepare search values array
-		$search_values = array();
-		if ( ! empty( $search_term ) ) {
-			$search_values = array_fill( 0, count( $where_conditions ), $search_value );
-		}
+		$where_data    = $this->build_safe_where_clause( $columns, $search_term );
+		$where_clause  = $where_data['sql'];
+		$search_values = $where_data['params'];
 
 		// Get total rows count for search
-		$count_query = "SELECT COUNT(*) FROM `{$table}` {$where_clause}";
+		$count_query = "SELECT COUNT(*) FROM {$safe_table} {$where_clause}";
 		if ( ! empty( $search_values ) ) {
 			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$total_rows = $wpdb->get_var( $wpdb->prepare( $count_query, $search_values ) );
@@ -828,7 +847,7 @@ class Lukic_DB_Tables_Manager {
 		$offset = ( $page - 1 ) * $per_page;
 
 		// Get data with search and pagination — use prepare() for LIMIT params.
-		$data_query = "SELECT * FROM `{$table}` {$where_clause} LIMIT %d, %d";
+		$data_query = "SELECT {$select_columns} FROM {$safe_table} {$where_clause} LIMIT %d, %d";
 		if ( ! empty( $search_values ) ) {
 			$search_values[] = $offset;
 			$search_values[] = $per_page;
@@ -872,14 +891,7 @@ class Lukic_DB_Tables_Manager {
 			);
 		}
 
-		// Get table structure to identify primary key
-		$primary_key = null;
-		foreach ( $columns as $column ) {
-			if ( $column->Key === 'PRI' ) {
-				$primary_key = $column->Field;
-				break;
-			}
-		}
+		$primary_key = $primary_column ? $primary_column->Field : null;
 
 		// Calculate total pages
 		$total_pages = (int) ceil( $total_rows / $per_page );
@@ -955,22 +967,242 @@ class Lukic_DB_Tables_Manager {
 	}
 
 	/**
-	 * Validate provided table name against allowed characters and existence.
+	 * Get all validated table names available to the current database.
+	 *
+	 * @return array
+	 */
+	private function get_validated_table_names() {
+		if ( is_array( $this->validated_tables ) ) {
+			return $this->validated_tables;
+		}
+
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$table_names = $wpdb->get_col( 'SHOW TABLES' );
+
+		$this->validated_tables = array();
+
+		foreach ( (array) $table_names as $table_name ) {
+			$table_name = is_string( $table_name ) ? trim( $table_name ) : '';
+			if ( '' !== $table_name && preg_match( '/^[A-Za-z0-9_]+$/', $table_name ) ) {
+				$this->validated_tables[] = $table_name;
+			}
+		}
+
+		return $this->validated_tables;
+	}
+
+	/**
+	 * Return cached table schema with validated identifiers only.
+	 *
+	 * @param string $table Validated table name.
+	 * @return array
+	 */
+	private function get_safe_table_columns( $table ) {
+		$table = $this->validate_table_name( $table );
+		if ( ! $table ) {
+			return array();
+		}
+
+		if ( isset( $this->table_schema_cache[ $table ] ) ) {
+			return $this->table_schema_cache[ $table ];
+		}
+
+		global $wpdb;
+		$safe_table = $this->quote_identifier( $table );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$columns = $wpdb->get_results( "DESCRIBE {$safe_table}" );
+
+		if ( empty( $columns ) ) {
+			$this->table_schema_cache[ $table ] = array();
+			return array();
+		}
+
+		$safe_columns = array();
+		foreach ( $columns as $column ) {
+			$field = isset( $column->Field ) ? $this->validate_column_name( $column->Field ) : false;
+			if ( ! $field ) {
+				continue;
+			}
+
+			$safe_columns[ $field ] = (object) array(
+				'Field'   => $field,
+				'Type'    => isset( $column->Type ) ? sanitize_text_field( (string) $column->Type ) : '',
+				'Null'    => isset( $column->Null ) ? sanitize_text_field( (string) $column->Null ) : '',
+				'Key'     => isset( $column->Key ) ? sanitize_text_field( (string) $column->Key ) : '',
+				'Default' => property_exists( $column, 'Default' ) ? $column->Default : null,
+				'Extra'   => isset( $column->Extra ) ? sanitize_text_field( (string) $column->Extra ) : '',
+			);
+		}
+
+		$this->table_schema_cache[ $table ] = $safe_columns;
+
+		return $safe_columns;
+	}
+
+	/**
+	 * Quote a validated SQL identifier.
+	 *
+	 * @param string $identifier Validated identifier.
+	 * @return string
+	 */
+	private function quote_identifier( $identifier ) {
+		return '`' . $identifier . '`';
+	}
+
+	/**
+	 * Build a comma-separated list of validated column identifiers.
+	 *
+	 * @param array $columns Validated schema columns.
+	 * @return string
+	 */
+	private function get_safe_select_columns_sql( $columns ) {
+		$identifiers = array();
+
+		foreach ( $columns as $column ) {
+			$identifiers[] = $this->quote_identifier( $column->Field );
+		}
+
+		return implode( ', ', $identifiers );
+	}
+
+	/**
+	 * Find the primary key column in a validated schema list.
+	 *
+	 * @param array $columns Validated schema columns.
+	 * @return object|null
+	 */
+	private function get_primary_key_column( $columns ) {
+		foreach ( $columns as $column ) {
+			if ( isset( $column->Key ) && 'PRI' === $column->Key ) {
+				return $column;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Return columns that are safe and practical to search with LIKE.
+	 *
+	 * @param array $columns Validated schema columns.
+	 * @return array
+	 */
+	private function get_searchable_columns( $columns ) {
+		$searchable = array();
+
+		foreach ( $columns as $column ) {
+			$type = strtolower( (string) $column->Type );
+
+			if ( false !== strpos( $type, 'blob' ) || false !== strpos( $type, 'binary' ) || false !== strpos( $type, 'geometry' ) ) {
+				continue;
+			}
+
+			$searchable[] = $column;
+		}
+
+		return $searchable;
+	}
+
+	/**
+	 * Build a safe WHERE clause for text search using validated columns only.
+	 *
+	 * @param array  $columns     Validated schema columns.
+	 * @param string $search_term Search term.
+	 * @return array
+	 */
+	private function build_safe_where_clause( $columns, $search_term ) {
+		$search_term = is_string( $search_term ) ? $search_term : '';
+		if ( '' === $search_term ) {
+			return array(
+				'sql'    => '',
+				'params' => array(),
+			);
+		}
+
+		global $wpdb;
+
+		$fragments    = array();
+		$search_value = '%' . $wpdb->esc_like( $search_term ) . '%';
+		$params       = array();
+
+		foreach ( $this->get_searchable_columns( $columns ) as $column ) {
+			$fragments[] = 'CAST(' . $this->quote_identifier( $column->Field ) . ' AS CHAR) LIKE %s';
+			$params[]    = $search_value;
+		}
+
+		if ( empty( $fragments ) ) {
+			return array(
+				'sql'    => '',
+				'params' => array(),
+			);
+		}
+
+		return array(
+			'sql'    => 'WHERE (' . implode( ' OR ', $fragments ) . ')',
+			'params' => $params,
+		);
+	}
+
+	/**
+	 * Get the safest available placeholder for a schema column type.
+	 *
+	 * @param string $column_type Raw schema type.
+	 * @return string
+	 */
+	private function get_column_placeholder( $column_type ) {
+		$column_type = strtolower( (string) $column_type );
+
+		if ( preg_match( '/(?:tinyint|smallint|mediumint|int|bigint|bit|serial)/', $column_type ) ) {
+			return '%d';
+		}
+
+		if ( preg_match( '/(?:decimal|numeric|float|double|real)/', $column_type ) ) {
+			return '%f';
+		}
+
+		return '%s';
+	}
+
+	/**
+	 * Normalize a value for a validated schema column.
+	 *
+	 * @param mixed  $value  Raw value.
+	 * @param object $column Validated schema column object.
+	 * @return mixed
+	 */
+	private function normalize_column_value( $value, $column ) {
+		if ( null === $value || 'NULL' === $value || '' === $value ) {
+			return null;
+		}
+
+		$placeholder = $this->get_column_placeholder( $column->Type );
+
+		if ( '%d' === $placeholder ) {
+			return (int) $value;
+		}
+
+		if ( '%f' === $placeholder ) {
+			return (float) $value;
+		}
+
+		return sanitize_textarea_field( (string) $value );
+	}
+
+	/**
+	 * Validate provided table name against allowed characters and actual schema.
 	 *
 	 * @param string $table Raw table name.
 	 * @return string|false
 	 */
 	private function validate_table_name( $table ) {
-
-		$table = trim( $table );
-		if ( $table === '' || ! preg_match( '/^[A-Za-z0-9_]+$/', $table ) ) {
+		$table = is_string( $table ) ? trim( $table ) : '';
+		if ( '' === $table || ! preg_match( '/^[A-Za-z0-9_]+$/', $table ) ) {
 			return false;
 		}
 
-		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
-		return $exists ? $table : false;
+		return in_array( $table, $this->get_validated_table_names(), true ) ? $table : false;
 	}
 
 	/**
@@ -980,9 +1212,8 @@ class Lukic_DB_Tables_Manager {
 	 * @return string|false
 	 */
 	private function validate_column_name( $identifier ) {
-
-		$identifier = trim( $identifier );
-		if ( $identifier === '' || ! preg_match( '/^[A-Za-z0-9_]+$/', $identifier ) ) {
+		$identifier = is_string( $identifier ) ? trim( $identifier ) : '';
+		if ( '' === $identifier || ! preg_match( '/^[A-Za-z0-9_]+$/', $identifier ) ) {
 			return false;
 		}
 

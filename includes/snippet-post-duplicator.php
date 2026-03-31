@@ -115,45 +115,18 @@ if ( ! function_exists( 'Lukic_duplicate_post_init' ) ) {
 			wp_set_object_terms( $new_post_id, $post_terms, $taxonomy, false );
 		}
 
-		// Copy post meta data
-		global $wpdb;
+		// Copy post meta data via WordPress APIs instead of bulk SQL.
+		$post_meta = get_post_meta( $post_id );
 
-		// Get all current post meta
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$post_meta_infos = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id = %d",
-				$post_id
-			)
-		);
-
-		if ( ! empty( $post_meta_infos ) ) {
-			$sql_query     = "INSERT INTO $wpdb->postmeta (post_id, meta_key, meta_value) ";
-			$sql_query_sel = array();
-
-			foreach ( $post_meta_infos as $meta_info ) {
-				$meta_key = $meta_info->meta_key;
-
-				// Skip the old slug meta key
-				if ( '_wp_old_slug' == $meta_key ) {
+		if ( ! empty( $post_meta ) ) {
+			foreach ( $post_meta as $meta_key => $meta_values ) {
+				if ( '_wp_old_slug' === $meta_key ) {
 					continue;
 				}
 
-				$meta_value = $meta_info->meta_value;
-
-				$sql_query_sel[] = $wpdb->prepare(
-					'SELECT %d, %s, %s',
-					$new_post_id,
-					$meta_key,
-					$meta_value
-				);
-			}
-
-			if ( ! empty( $sql_query_sel ) ) {
-				$sql_query .= implode( ' UNION ALL ', $sql_query_sel );
-				// The meta_key and meta_value are already safely passed into prepare() in the loop.
-				// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->query( $sql_query );
+				foreach ( (array) $meta_values as $meta_value ) {
+					add_post_meta( $new_post_id, $meta_key, maybe_unserialize( $meta_value ) );
+				}
 			}
 		}
 
