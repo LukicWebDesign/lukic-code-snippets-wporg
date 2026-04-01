@@ -34,9 +34,48 @@ add_action( 'admin_menu', 'Lukic_acf_columns_menu' );
  * Register settings
  */
 function Lukic_acf_columns_register_settings() {
-	register_setting( 'Lukic_acf_columns_group', Lukic_ACF_COLUMNS_OPTION, 'sanitize_text_field' );
+	register_setting(
+		'Lukic_acf_columns_group',
+		Lukic_ACF_COLUMNS_OPTION,
+		'Lukic_sanitize_acf_columns_settings'
+	);
 }
 add_action( 'admin_init', 'Lukic_acf_columns_register_settings' );
+
+/**
+ * Sanitize ACF columns settings.
+ *
+ * @param mixed $settings Raw settings value.
+ * @return array
+ */
+function Lukic_sanitize_acf_columns_settings( $settings ) {
+	$sanitized = array(
+		'fields'     => array(),
+		'post_types' => array(),
+	);
+
+	if ( ! is_array( $settings ) ) {
+		return $sanitized;
+	}
+
+	if ( isset( $settings['fields'] ) && is_array( $settings['fields'] ) ) {
+		$sanitized['fields'] = array_values(
+			array_filter(
+				array_map( 'sanitize_text_field', wp_unslash( $settings['fields'] ) )
+			)
+		);
+	}
+
+	if ( isset( $settings['post_types'] ) && is_array( $settings['post_types'] ) ) {
+		$sanitized['post_types'] = array_values(
+			array_filter(
+				array_map( 'sanitize_key', wp_unslash( $settings['post_types'] ) )
+			)
+		);
+	}
+
+	return $sanitized;
+}
 
 /**
  * Check if ACF is active
@@ -111,12 +150,16 @@ function Lukic_get_acf_columns_settings() {
 
 	$settings = get_option( Lukic_ACF_COLUMNS_OPTION, $default_settings );
 
+	if ( ! is_array( $settings ) ) {
+		return $default_settings;
+	}
+
 	// Ensure we have the expected structure
-	if ( ! isset( $settings['fields'] ) ) {
+	if ( ! isset( $settings['fields'] ) || ! is_array( $settings['fields'] ) ) {
 		$settings['fields'] = array();
 	}
 
-	if ( ! isset( $settings['post_types'] ) ) {
+	if ( ! isset( $settings['post_types'] ) || ! is_array( $settings['post_types'] ) ) {
 		$settings['post_types'] = array();
 	}
 

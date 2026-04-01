@@ -41,7 +41,7 @@ class Lukic_Last_Login {
 	 * @param WP_User $user The user object
 	 */
 	public function update_login_timestamp( $user_login, $user ) {
-		update_user_meta( $user->ID, 'Lukic_last_login', current_time( 'timestamp' ) );
+		update_user_meta( $user->ID, 'Lukic_last_login', current_time( 'timestamp', true ) );
 	}
 
 	/**
@@ -68,16 +68,18 @@ class Lukic_Last_Login {
 			$last_login = get_user_meta( $user_id, 'Lukic_last_login', true );
 
 			if ( ! empty( $last_login ) ) {
-				// Format the timestamp into a human-readable format
+				$last_login = (int) $last_login;
+
+				// Format using the WordPress site timezone, with UTC as fallback.
 				$format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
-				$output = date_i18n( $format, $last_login );
+				$output = wp_date( $format, $last_login, wp_timezone() );
 
 				// Add a title with the relative time (e.g., "3 days ago")
-				$time_diff = human_time_diff( $last_login, current_time( 'timestamp' ) );
+				$time_diff = human_time_diff( $last_login, current_time( 'timestamp', true ) );
 				/* translators: %s: Time difference (e.g., "3 days", "2 hours") */
-				$output = '<span title="' . sprintf( __( '%s ago', 'lukic-code-snippets' ), $time_diff ) . '">' . $output . '</span>';
+				$output = '<span title="' . esc_attr( sprintf( __( '%s ago', 'lukic-code-snippets' ), $time_diff ) ) . '">' . esc_html( $output ) . '</span>';
 			} else {
-				$output = '<span class="Lukic-no-login-data">' . __( 'No data', 'lukic-code-snippets' ) . '</span>';
+				$output = '<span class="Lukic-no-login-data">' . esc_html__( 'No data', 'lukic-code-snippets' ) . '</span>';
 			}
 		}
 

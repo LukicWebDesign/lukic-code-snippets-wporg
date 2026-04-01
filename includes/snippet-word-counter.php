@@ -49,7 +49,7 @@ class Lukic_Word_Counter {
 			return;
 		}
 
-		wp_register_style( 'Lukic-word-counter-styles', false );
+		wp_register_style( 'Lukic-word-counter-styles', false, array(), Lukic_SNIPPET_CODES_VERSION );
 		wp_enqueue_style( 'Lukic-word-counter-styles' );
 		wp_add_inline_style( 'Lukic-word-counter-styles', '
 			.Lukic-word-counter-container { margin-top: 20px; }

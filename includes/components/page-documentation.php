@@ -88,7 +88,7 @@ function Lukic_enqueue_documentation_scripts( $hook ) {
 		return;
 	}
 
-	wp_register_style( 'Lukic-doc-styles', false );
+	wp_register_style( 'Lukic-doc-styles', false, array(), Lukic_SNIPPET_CODES_VERSION );
 	wp_enqueue_style( 'Lukic-doc-styles' );
 	wp_add_inline_style( 'Lukic-doc-styles', '
 		.Lukic-documentation-controls { margin-bottom: 30px; display: flex; justify-content: flex-end; }

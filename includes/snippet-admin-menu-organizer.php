@@ -101,7 +101,7 @@ if ( ! function_exists( 'Lukic_admin_menu_organizer_init' ) ) {
 			if ( isset( $_GET['page'] ) && sanitize_key( wp_unslash( $_GET['page'] ) ) === 'lukic-admin-menu-organizer' ) {
 				wp_enqueue_script( 'jquery-ui-sortable' );
 				
-				wp_register_style( 'Lukic-admin-menu-styles', false );
+				wp_register_style( 'Lukic-admin-menu-styles', false, array(), Lukic_SNIPPET_CODES_VERSION );
 				wp_enqueue_style( 'Lukic-admin-menu-styles' );
 				wp_add_inline_style( 'Lukic-admin-menu-styles', '
 					#lukic-menu-organizer-list { max-width: 800px; padding: 20px; }

@@ -786,4 +786,3 @@ class Lukic_Login_Page_Designer {
 
 // Initialize the class.
 new Lukic_Login_Page_Designer();
-

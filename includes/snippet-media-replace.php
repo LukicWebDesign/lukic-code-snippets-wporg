@@ -162,8 +162,8 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 									<li>
 										<?php
 										printf(
-											/* translators: %s: Media library link */
 											wp_kses(
+												/* translators: %s: Media library link */
 												__( 'Go to the %s', 'lukic-code-snippets' ),
 												array()
 											),

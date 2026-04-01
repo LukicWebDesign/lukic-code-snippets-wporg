@@ -246,7 +246,6 @@ if ( ! function_exists( 'Lukic_redirect_manager_init' ) ) {
 							<div class="Lukic-empty-state">
 								<span class="dashicons dashicons-randomize" style="font-size: 50px; color: #ccc; margin-bottom: 10px;"></span>
 								<p><?php esc_html_e( 'No redirects found. Add your first redirect using the "Add New" tab.', 'lukic-code-snippets' ); ?></p>
-								<a href="#tab-add-new" class="button button-primary" style="background-color: #00E1AF; border-color: #00E1AF;"><?php esc_html_e( 'Add Your First Redirect', 'lukic-code-snippets' ); ?></a>
 							</div>
 						<?php else : ?>
 							<table class="wp-list-table widefat fixed striped">

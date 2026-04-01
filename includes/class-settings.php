@@ -46,7 +46,7 @@ class Lukic_Snippet_Codes_Settings {
 
 		// CSS is now handled by the main plugin centrally
 		
-		wp_register_style( 'Lukic-admin-styles', false );
+		wp_register_style( 'Lukic-admin-styles', false, array(), Lukic_SNIPPET_CODES_VERSION );
 		wp_enqueue_style( 'Lukic-admin-styles' );
 		wp_add_inline_style( 'Lukic-admin-styles', '
 			@keyframes lukic-spin { 
@@ -751,6 +751,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 			wp_send_json_error( __( 'Missing options payload.', 'lukic-code-snippets' ), 400 );
 		}
 
+		// JSON must be decoded before per-value sanitization; sanitizing the raw string would corrupt valid JSON.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$options_json = wp_unslash( $_POST['options'] );
 		if ( ! is_string( $options_json ) ) {
 			wp_send_json_error( __( 'Invalid JSON data.', 'lukic-code-snippets' ), 400 );

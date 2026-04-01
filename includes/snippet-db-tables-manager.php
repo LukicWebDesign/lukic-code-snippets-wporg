@@ -685,15 +685,18 @@ class Lukic_DB_Tables_Manager {
 			wp_send_json_error( __( 'Missing required parameters.', 'lukic-code-snippets' ) );
 		}
 
-		// Get the specific row
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$row = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT {$select_columns} FROM {$safe_table} WHERE " . $this->quote_identifier( $primary_key ) . " = {$placeholder}",
-				$primary_value
-			),
-			ARRAY_A
+		// Get the specific row.
+		$where_identifier = $this->quote_identifier( $primary_key );
+
+		// Validated identifiers are interpolated here; the primary value remains placeholder-bound.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$row_query = $wpdb->prepare(
+			"SELECT {$select_columns} FROM {$safe_table} WHERE {$where_identifier} = {$placeholder}",
+			$primary_value
 		);
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$row = $wpdb->get_row( $row_query, ARRAY_A );
 
 		if ( ! $row ) {
 			wp_send_json_error( __( 'Row not found.', 'lukic-code-snippets' ) );
