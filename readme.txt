@@ -1,4 +1,4 @@
-=== Lukic Code Snippets ===
+﻿=== Lukic Code Snippets ===
 Contributors: wplukic
 Donate link: https://www.paypal.com/paypalme/lukicwebdesign
 Tags: snippets, performance, admin, security, seo
@@ -9,11 +9,11 @@ Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-A modular performance toolkit: 40+ code snippets you toggle on and off — zero bloat when inactive.
+A modular performance toolkit with 37 code snippets you can toggle on and off.
 
 == Description ==
 
-**Lukic Code Snippets** replaces a dozen single-purpose plugins with one lightweight dashboard. Every snippet is loaded conditionally — if it is toggled off, its file is never included, giving you **zero performance impact** for inactive features.
+**Lukic Code Snippets** replaces a dozen single-purpose plugins with one lightweight dashboard. Every snippet is loaded conditionally - if it is toggled off, its file is never included, giving you **zero performance impact** for inactive features.
 
 = What's Included =
 
@@ -21,58 +21,58 @@ A modular performance toolkit: 40+ code snippets you toggle on and off — zero 
 * Admin Bar Site Visibility Indicator
 * Wider Admin Menu
 * Show IDs in Admin Tables
-* Show Featured Images in Admin Tables (with inline AJAX upload)
+* Show Featured Images in Admin Tables
 * Clean Dashboard
 * Hide Admin Bar on Frontend
-* Hide Admin Notices (collapsible panel)
+* Hide Admin Notices
 * Custom Admin Footer Text
 * Show ACF Fields in Admin Tables
 * Show Custom Taxonomy Filters
 * Show Current Template
-* Admin Menu Organizer (drag-and-drop)
+* Admin Menu Organizer
 * Show Active Plugins First
 * Word Counter
-* Login Page Designer (logo, background, colors, button, live preview)
+* Login Page Designer
 
 **Content Management**
 * Enable Classic Editor
 * Post & Page Duplicator
-* Content Order (drag-and-drop reordering)
+* Content Order
 * Search Posts by Slug
 
 **Media Management**
-* SVG Upload Support (with sanitization)
-* Media Replacement (same ID, filename, and links)
+* SVG Upload Support
+* Media Replacement
 * Media Size Column
 * Image Sizes Panel
-* User Profile Image (local avatar upload)
+* User Profile Image
 
 **SEO & Performance**
 * Hide WP Version
 * Disable XML-RPC
-* Meta Tags Editor (title & description per post/page/taxonomy)
-* Redirect Manager (301/302/307/308 with hit tracking and wildcard patterns)
+* Meta Tags Editor
+* Redirect Manager
 * Fluid Typography Calculator
 
 **Security**
 * Hide Author Slugs
-* Security Headers Manager (CSP, HSTS, X-Frame-Options, etc.)
+* Security Headers Manager
 
 **Utility & Development**
-* Maintenance Mode (customizable page with live preview)
-* Limit Revisions (per post type)
-* Custom Database Tables Manager (view, search, edit, export CSV)
-* Image Attributes Editor (bulk edit alt text, title, caption)
-* Last Login User (column in Users table)
-* Disable Comments (preserves WooCommerce reviews)
+* Maintenance Mode
+* Limit Revisions
+* Custom Database Tables Manager
+* Image Attributes Editor
+* Last Login User
+* Disable Comments
 
 = Key Design Principles =
 
-* **Truly modular** — inactive snippets are never loaded (`require_once` inside toggle check)
-* **Auto-save** — toggles save via AJAX instantly; no manual save required
-* **Zero external requests** — all CSS/JS assets are bundled locally (DataTables, Magnific Popup)
-* **One text domain** — every string uses `lukic-code-snippets` for full translation readiness
-* **Clean uninstall** — choose to preserve or delete all data on plugin removal
+* **Truly modular** - inactive snippets are never loaded (`require_once` inside toggle check)
+* **Auto-save** - toggles save via AJAX instantly; no manual save required
+* **Zero external requests** - all CSS/JS assets are bundled locally (DataTables, Magnific Popup)
+* **One text domain** - every string uses `lukic-code-snippets` for full translation readiness
+* **Clean uninstall** - choose to preserve or delete all data on plugin removal
 
 == Installation ==
 
@@ -85,11 +85,11 @@ A modular performance toolkit: 40+ code snippets you toggle on and off — zero 
 
 = Will inactive snippets slow down my site? =
 
-No. Each snippet file is loaded with `require_once` inside a conditional check. If a snippet is toggled off, its PHP file is never included — the overhead is a single `isset()` check per snippet.
+No. Each snippet file is loaded with `require_once` inside a conditional check. If a snippet is toggled off, its PHP file is never included - the overhead is a single `isset()` check per snippet.
 
 = Will my settings be lost if I deactivate or delete the plugin? =
 
-By default, all settings and custom tables are **preserved** when you deactivate or delete the plugin. If you want a clean removal, go to **Code Snippets → Settings** and select "Delete all plugin data when plugin is deleted."
+By default, all settings and custom tables are **preserved** when you deactivate or delete the plugin. If you want a clean removal, go to **Code Snippets > Settings** and select "Delete all plugin data when plugin is deleted."
 
 = Does this plugin work with multisite? =
 
@@ -101,7 +101,7 @@ Yes. The manager is read-only by default (view, search, export). Row editing is 
 
 = Can I translate this plugin? =
 
-Yes. All UI strings use the `lukic-code-snippets` text domain with proper `__()` and `_e()` wrappers. A `/languages` directory is included and `load_plugin_textdomain()` is called on `init`.
+Yes. All UI strings use the `lukic-code-snippets` text domain with proper `__()` and `_e()` wrappers. A `/languages` directory is included, and WordPress loads plugin translations from it.
 
 == Screenshots ==
 
@@ -131,7 +131,7 @@ Yes. All UI strings use the `lukic-code-snippets` text domain with proper `__()`
 * Docs: Clarify Redirect Manager trailing slash URL usage rules.
 
 = 2.8.0 =
-* New: Login Page Designer snippet — full visual customization of the WordPress login page (logo, background, form card, colors, button) with a real-time live preview panel.
+* New: Login Page Designer snippet - full visual customization of the WordPress login page (logo, background, form card, colors, button) with a real-time live preview panel.
 * Security: Added `$wpdb->prepare()` for all LIMIT clauses in the Database Tables Manager.
 * Security: Fixed redirect delete bug caused by table name case mismatch.
 * Security: Escaped all dynamic class and `number_format()` output.
@@ -161,7 +161,7 @@ Yes. All UI strings use the `lukic-code-snippets` text domain with proper `__()`
 * New: Auto-save for snippet toggles with intelligent page refresh.
 
 = 2.0.0 =
-* Major: Architectural overhaul — CSS framework, Asset Manager, reusable header component, Helpers class.
+* Major: Architectural overhaul - CSS framework, Asset Manager, reusable header component, Helpers class.
 
 = 1.6.0 =
 * New: Security Headers, Limit Revisions, Image Sizes Panel, Redirect Manager, DB Tables Manager.
