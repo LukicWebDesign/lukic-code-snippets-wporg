@@ -333,13 +333,13 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 	function Lukic_media_replace_handle_upload() {
 		// Check if our form was submitted
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		if ( ! isset( $_POST['action'] ) || wp_unslash( $_POST['action'] ) !== 'Lukic_replace_media' ) {
+		if ( ! isset( $_POST['action'] ) || sanitize_key( wp_unslash( $_POST['action'] ) ) !== 'lukic_replace_media' ) {
 			return;
 		}
 
 		// Get attachment ID
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$attachment_id = isset( $_POST['attachment_id'] ) ? intval( wp_unslash( $_POST['attachment_id'] ) ) : 0;
+		$attachment_id = isset( $_POST['attachment_id'] ) ? absint( wp_unslash( $_POST['attachment_id'] ) ) : 0;
 		if ( ! $attachment_id ) {
 			wp_die( esc_html__( 'No attachment ID specified.', 'lukic-code-snippets' ) );
 		}
@@ -396,7 +396,7 @@ if ( ! function_exists( 'Lukic_media_replace_init' ) ) {
 
 		// Get preserve filename setting
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$preserve_filename = isset( $_POST['preserve_filename'] ) && wp_unslash( $_POST['preserve_filename'] ) == '1';
+		$preserve_filename = isset( $_POST['preserve_filename'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['preserve_filename'] ) );
 
 		$uploaded_file_check = wp_check_filetype_and_ext( $uploaded_file['tmp_name'], $uploaded_file['name'] );
 		$uploaded_file_info  = pathinfo( $uploaded_file['name'] );

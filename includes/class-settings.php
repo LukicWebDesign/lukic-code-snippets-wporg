@@ -751,8 +751,12 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 			wp_send_json_error( __( 'Missing options payload.', 'lukic-code-snippets' ), 400 );
 		}
 
-		$options_json = sanitize_text_field( wp_unslash( $_POST['options'] ) );
-		$options      = json_decode( $options_json, true );
+		$options_json = wp_unslash( $_POST['options'] );
+		if ( ! is_string( $options_json ) ) {
+			wp_send_json_error( __( 'Invalid JSON data.', 'lukic-code-snippets' ), 400 );
+		}
+
+		$options = json_decode( $options_json, true );
 		if ( json_last_error() !== JSON_ERROR_NONE || ! is_array( $options ) ) {
 			wp_send_json_error( __( 'Invalid JSON data.', 'lukic-code-snippets' ), 400 );
 		}
